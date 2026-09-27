@@ -1,0 +1,16 @@
+const fs=require('fs');const g=JSON.parse(fs.readFileSync('th.json','utf8'));
+const TH={'Mae Hong Son':'แม่ฮ่องสอน','Chumphon':'ชุมพร','Nakhon Si Thammarat':'นครศรีธรรมราช','Phuket':'ภูเก็ต','Phangnga':'พังงา','Ranong':'ระนอง','Surat Thani':'สุราษฎร์ธานี','Krabi':'กระบี่','Phatthalung':'พัทลุง','Satun':'สตูล','Songkhla':'สงขลา','Trang':'ตรัง','Yala':'ยะลา','Chiang Rai':'เชียงราย','Chiang Mai':'เชียงใหม่','Lampang':'ลำปาง','Lamphun':'ลำพูน','Nan':'น่าน','Phayao':'พะเยา','Phrae':'แพร่','Phitsanulok':'พิษณุโลก','Sukhothai':'สุโขทัย','Uttaradit':'อุตรดิตถ์','Kanchanaburi':'กาญจนบุรี','Kamphaeng Phet':'กำแพงเพชร','Phichit':'พิจิตร','Phetchabun':'เพชรบูรณ์','Suphan Buri':'สุพรรณบุรี','Tak':'ตาก','Uthai Thani':'อุทัยธานี','Ang Thong':'อ่างทอง','Chai Nat':'ชัยนาท','Lop Buri':'ลพบุรี','Nakhon Nayok':'นครนายก','Prachin Buri':'ปราจีนบุรี','Nakhon Sawan':'นครสวรรค์','Phra Nakhon Si Ayutthaya':'พระนครศรีอยุธยา','Pathum Thani':'ปทุมธานี','Sing Buri':'สิงห์บุรี','Saraburi':'สระบุรี','Bangkok Metropolis':'กรุงเทพมหานคร','Nonthaburi':'นนทบุรี','Nakhon Pathom':'นครปฐม','Phetchaburi':'เพชรบุรี','Prachuap Khiri Khan':'ประจวบคีรีขันธ์','Ratchaburi':'ราชบุรี','Samut Prakan':'สมุทรปราการ','Samut Sakhon':'สมุทรสาคร','Samut Songkhram':'สมุทรสงคราม','Si Sa Ket':'ศรีสะเกษ','Ubon Ratchathani':'อุบลราชธานี','Amnat Charoen':'อำนาจเจริญ','Yasothon':'ยโสธร','Chon Buri':'ชลบุรี','Chachoengsao':'ฉะเชิงเทรา','Chanthaburi':'จันทบุรี','Sa Kaeo':'สระแก้ว','Rayong':'ระยอง','Trat':'ตราด','Buri Ram':'บุรีรัมย์','Chaiyaphum':'ชัยภูมิ','Khon Kaen':'ขอนแก่น','Kalasin':'กาฬสินธุ์','Maha Sarakham':'มหาสารคาม','Nakhon Ratchasima':'นครราชสีมา','Roi Et':'ร้อยเอ็ด','Surin':'สุรินทร์','Loei':'เลย','Nong Khai':'หนองคาย','Sakon Nakhon':'สกลนคร','Udon Thani':'อุดรธานี','Nong Bua Lam Phu':'หนองบัวลำภู','Nakhon Phanom':'นครพนม','Mukdahan':'มุกดาหาร','Narathiwat':'นราธิวาส','Pattani':'ปัตตานี','Bueng Kan':'บึงกาฬ'};
+const K=Math.cos(13*Math.PI/180),SC=62;
+function dp(p,t){if(p.length<3)return p;let mx=0,mi=0;const[a,b]=[p[0],p[p.length-1]];const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1e-9;
+ for(let i=1;i<p.length-1;i++){const d=Math.abs(dy*p[i][0]-dx*p[i][1]+b[0]*a[1]-b[1]*a[0])/L;if(d>mx){mx=d;mi=i}}
+ if(mx>t)return dp(p.slice(0,mi+1),t).slice(0,-1).concat(dp(p.slice(mi),t));return[a,b]}
+let minx=1e9,maxx=-1e9,miny=1e9,maxy=-1e9;
+const feats=g.features.map(f=>{const polys=f.geometry.type==='Polygon'?[f.geometry.coordinates]:f.geometry.coordinates;
+ const rings=[];for(const poly of polys)for(const ring of poly){const pr=ring.map(([x,y])=>[x*K*SC,-y*SC]);const h=pr.length>>1;const s=dp(pr.slice(0,h+1),0.35).slice(0,-1).concat(dp(pr.slice(h),0.35));if(s.length>=4)rings.push(s)}
+ rings.forEach(r=>r.forEach(([x,y])=>{minx=Math.min(minx,x);maxx=Math.max(maxx,x);miny=Math.min(miny,y);maxy=Math.max(maxy,y)}));
+ return{p:TH[f.properties.name],rings}});
+const pad=4,W=Math.ceil(maxx-minx+2*pad),H=Math.ceil(maxy-miny+2*pad);
+const fix=v=>(+v.toFixed(1));
+const out={w:W,h:H,f:feats.map(f=>({p:f.p,d:f.rings.map(r=>'M'+r.map(([x,y])=>fix(x-minx+pad)+' '+fix(y-miny+pad)).join('L')+'Z').join('')}))};
+const miss=g.features.filter(f=>!TH[f.properties.name]);console.log('missing',miss.length,'w,h',W,H);
+fs.writeFileSync('map.json',JSON.stringify(out));console.log(fs.statSync('map.json').size);

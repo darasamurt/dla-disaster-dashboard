@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard ทรัพยากรป้องกันและบรรเทาสาธารณภัย อปท.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Thai:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f4f6f9;--card:#fff;--ink:#1b2430;--muted:#5d6b7c;--line:#e2e7ee;--track:#eef1f5;
+  --vol:#0f766e;--dev:#2563eb;--veh:#d97706;--accent:#1e3a5f;--warn:#b45309;
+  --shadow:0 1px 2px rgba(16,24,40,.06),0 1px 3px rgba(16,24,40,.06);
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans Thai","Leelawadee UI",Tahoma,sans-serif;font-size:14px;line-height:1.5}
+header{background:var(--accent);color:#fff;padding:14px 16px 0}
+.wrap{max-width:1280px;margin:0 auto}
+h1{margin:0;font-size:20px;font-weight:600;letter-spacing:.1px}
+.sub{font-size:12.5px;opacity:.8;margin-top:2px}
+nav{display:flex;gap:4px;margin-top:12px;overflow-x:auto}
+nav button{appearance:none;border:0;background:transparent;color:#cdd8e6;font:inherit;font-weight:500;padding:9px 18px;border-radius:8px 8px 0 0;cursor:pointer;white-space:nowrap}
+nav button:hover{color:#fff;background:rgba(255,255,255,.08)}
+nav button[aria-selected=true]{background:var(--bg);color:var(--accent);font-weight:600}
+.filters{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.filters .wrap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr)) auto;gap:10px;padding:10px 16px;align-items:end}
+.f label{display:block;font-size:12px;color:var(--muted);margin-bottom:2px;font-weight:500}
+select{width:100%;font:inherit;padding:7px 8px;border:1px solid #c9d2de;border-radius:8px;background:#fff;color:var(--ink);min-height:38px}
+select:focus-visible,button:focus-visible{outline:2px solid #4c8dff;outline-offset:1px}
+.reset{font:inherit;border:1px solid #c9d2de;background:#fff;border-radius:8px;padding:7px 14px;min-height:38px;cursor:pointer;color:var(--ink)}
+.reset:hover{background:#eef2f7}
+main{max-width:1280px;margin:0 auto;padding:16px}
+.scope{font-size:13px;color:var(--muted);margin:0 0 12px}
+.scope b{color:var(--ink)}
+.page{display:none}.page.on{display:block}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--card);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);border-left:5px solid var(--c,#94a3b8)}
+.kpi .l{font-size:12.5px;color:var(--muted)}
+.kpi .v{font-size:28px;font-weight:700;line-height:1.2;font-variant-numeric:tabular-nums}
+.kpi .n{font-size:12px;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:12px}
+.card{background:var(--card);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow);min-width:0}
+.c4{grid-column:span 4}.c5{grid-column:span 5}.c6{grid-column:span 6}.c7{grid-column:span 7}.c8{grid-column:span 8}.c12{grid-column:span 12}
+h2{font-size:14.5px;margin:0 0 2px;font-weight:600}
+.hint{font-size:12px;color:var(--muted);margin:0 0 10px}
+.bars{display:flex;flex-direction:column;gap:5px;max-height:400px;overflow:auto;padding-right:4px}
+.br{display:grid;grid-template-columns:minmax(90px,36%) 1fr 64px;gap:8px;align-items:center;font-size:13px;border-radius:6px;padding:1px 2px}
+.br.click{cursor:pointer}.br.click:hover{background:#f1f5fa}
+.br.sel{background:#e7f0ff;outline:1px solid #9dbdf5}
+.br .t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.br .tr{background:var(--track);border-radius:4px;height:14px;overflow:hidden}
+.br .f{height:100%;border-radius:4px;min-width:1px;background:var(--col,var(--dev))}
+.br .n{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
+.cols{display:flex;align-items:flex-end;gap:3px;height:190px;padding-top:8px;border-bottom:1px solid var(--line)}
+.col{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
+.col .b{width:100%;background:var(--col,var(--dev));border-radius:3px 3px 0 0;min-height:1px}
+.col .v{font-size:10px;color:var(--muted);white-space:nowrap;margin-bottom:1px}
+.lab{display:flex;gap:3px;margin-top:3px}.lab span{flex:1;min-width:0;text-align:center;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.donut{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.leg{display:flex;flex-direction:column;gap:5px;font-size:13px}
+.leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
+.leg b{font-variant-numeric:tabular-nums}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:6px 8px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums}
+th:first-child,td:first-child{text-align:left}
+th{font-weight:600;color:var(--muted);font-size:12px;background:#fafbfc;position:sticky;top:0;cursor:pointer;white-space:nowrap;user-select:none}
+th.s::after{content:" ▼";font-size:9px}
+.tw{max-height:420px;overflow:auto}
+.cov{display:flex;flex-direction:column;gap:10px}
+.cov .row{display:grid;grid-template-columns:110px 1fr 70px;gap:8px;align-items:center}
+.chip{display:inline-flex;align-items:center;gap:6px;background:#e7f0ff;border:1px solid #9dbdf5;border-radius:999px;padding:2px 6px 2px 12px;font-size:12.5px;margin:0 0 10px}
+.chip button{border:0;background:#c9dcfb;border-radius:50%;width:20px;height:20px;cursor:pointer;line-height:1}
+.note{font-size:12px;color:var(--muted);margin-top:18px;padding:12px 14px;background:#fff;border-radius:12px;box-shadow:var(--shadow)}
+.note li{margin:2px 0}
+.empty{color:var(--muted);padding:20px;text-align:center}
+.r2{grid-row:span 2}
+.mapcard h2{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid #c9d2de;border-radius:8px;overflow:hidden}
+.seg button{font:inherit;font-size:12px;border:0;background:#fff;padding:3px 10px;cursor:pointer;color:var(--ink)}
+.seg button[aria-pressed=true]{background:var(--accent);color:#fff}
+.map svg{width:100%;height:auto;max-height:560px;display:block}
+.map path{stroke:#fff;stroke-width:.6;cursor:pointer;transition:opacity .15s}
+.map path:hover{stroke:#1b2430;stroke-width:1.2}
+.map path.sel{stroke:#1b2430;stroke-width:1.8}
+.map path.dim{opacity:.3}
+.mapinfo{font-size:13px;min-height:20px;margin-top:4px}
+.mleg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);margin-top:4px}
+.mleg i{flex:1;height:8px;border-radius:4px}
+@media (max-width:900px){
+  .r2{grid-row:auto}
+  .filters .wrap{grid-template-columns:1fr 1fr}
+  .reset{grid-column:span 2}
+  .c4,.c5,.c6,.c7,.c8{grid-column:span 12}
+  .br{grid-template-columns:minmax(80px,40%) 1fr 56px}
+}
+@media (max-width:520px){
+  .filters .wrap{grid-template-columns:1fr}.reset{grid-column:auto}
+  h1{font-size:17px}.kpi .v{font-size:24px}
+}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>ทรัพยากรด้านการป้องกันและบรรเทาสาธารณภัย ขององค์กรปกครองส่วนท้องถิ่น</h1>
+  <div class="sub" id="asof"></div>
+  <nav role="tablist" id="tabs">
+    <button role="tab" data-p="sum" aria-selected="true">1 สรุป</button>
+    <button role="tab" data-p="vol" aria-selected="false">2 อปพร.</button>
+    <button role="tab" data-p="dev" aria-selected="false">3 เครื่องมือ</button>
+    <button role="tab" data-p="veh" aria-selected="false">4 เครื่องจักรกล</button>
+  </nav>
+</div></header>
+
+<div class="filters"><div class="wrap">
+  <div class="f"><label for="fg">กลุ่มจังหวัด</label><select id="fg"></select></div>
+  <div class="f"><label for="fp">จังหวัด</label><select id="fp"></select></div>
+  <div class="f"><label for="fa">อำเภอ</label><select id="fa"></select></div>
+  <div class="f"><label for="fo">อปท.</label><select id="fo"></select></div>
+  <button class="reset" id="reset" type="button">ล้างตัวกรอง</button>
+</div></div>
+
+<main>
+  <p class="scope" id="scope"></p>
+
+  <section class="page on" id="p-sum">
+    <div class="kpis" id="k-sum"></div>
+    <div class="grid">
+      <div class="card c5 r2 mapcard" id="map-sum"></div>
+      <div class="card c7"><h2 id="sum-unit-t"></h2><p class="hint">คลิกหัวคอลัมน์เพื่อเรียงลำดับ</p><div class="tw" id="sum-unit"></div></div>
+      <div class="card c7"><h2>ความครอบคลุมของ อปท.</h2><p class="hint">สัดส่วน อปท. ในขอบเขตที่เลือก ที่มีทรัพยากรพร้อมใช้อย่างน้อย 1 รายการ</p><div class="cov" id="sum-cov"></div></div>
+      <div class="card c6"><h2>จำแนกตามประเภท อปท.</h2><p class="hint">จำนวน อปท. และทรัพยากรที่พร้อมใช้</p><div id="sum-type"></div></div>
+      <div class="card c6"><h2>10 อปท. ที่มีทรัพยากรรวมสูงสุด</h2><p class="hint">รวม อปพร. + เครื่องมือ + เครื่องจักรกล</p><div class="tw" id="sum-top"></div></div>
+    </div>
+  </section>
+
+  <section class="page" id="p-vol">
+    <div class="kpis" id="k-vol"></div>
+    <div class="grid">
+      <div class="card c5 r2 mapcard" id="map-vol"></div>
+      <div class="card c7"><h2>เพศ</h2><p class="hint">ระบุจากคำนำหน้าชื่อ</p><div id="vol-sex"></div></div>
+      <div class="card c7"><h2>ความรู้เฉพาะทาง</h2><p class="hint" id="vol-spec-h"></p><div class="bars" id="vol-spec"></div></div>
+      <div class="card c6"><h2 id="vol-unit-t"></h2><div class="bars" id="vol-unit"></div></div>
+      <div class="card c6"><h2>จำแนกตามประเภท อปท.</h2><div class="bars" id="vol-type"></div></div>
+      <div class="card c12"><h2>10 อปท. ที่มี อปพร. มากที่สุด</h2><div class="tw" id="vol-top"></div></div>
+    </div>
+  </section>
+
+  <section class="page" id="p-dev"><div id="dev-root"></div></section>
+  <section class="page" id="p-veh"><div id="veh-root"></div></section>
+
+  <div class="note" id="note"></div>
+</main>
+
+<script>
+const D=/*DATA*/null;
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Math.round(n).toLocaleString('th-TH');
+const th=(a,b)=>a.localeCompare(b,'th');
+const COL={vol:'#0f766e',dev:'#2563eb',veh:'#d97706'};
+const NAME={all:'ภาพรวม',vol:'อปพร.',dev:'เครื่องมือ',veh:'เครื่องจักรกล'};
+
+/* ---------- entities ---------- */
+const P2G={};for(const[g,ps]of Object.entries(D.groups))ps.split(' ').forEach(p=>P2G[p]=g);
+const GORDER=Object.keys(D.groups);
+const E=D.E.map((e,i)=>({i,p:e[0],a:e[1],n:e[2],t:e[3],g:P2G[e[0]],pa:e[0]+'|'+e[1]}));
+const N=E.length;
+const cnt={vol:new Float64Array(N),dev:new Float64Array(N),veh:new Float64Array(N)};
+D.vol.forEach(r=>cnt.vol[r[0]]+=r[3]);
+D.dev.rows.forEach(r=>cnt.dev[r[0]]+=r[5]);
+D.veh.rows.forEach(r=>cnt.veh[r[0]]+=r[5]);
+const cntv=cnt.vol;
+const TYPES=['อบจ.','เทศบาลนคร','เทศบาลเมือง','เทศบาลตำบล','อบต.','รูปแบบพิเศษ','อื่นๆ'];
+
+/* ---------- filter state ---------- */
+const S={g:'',p:'',a:'',o:''};
+let ok=new Uint8Array(N).fill(1);
+function computeOk(){for(const e of E)ok[e.i]=(!S.g||e.g===S.g)&&(!S.p||e.p===S.p)&&(!S.a||e.pa===S.a)&&(S.o===''||e.i===+S.o)?1:0}
+const okEnts=()=>E.filter(e=>ok[e.i]);
+function fill(sel,items,val,allLabel){
+  sel.innerHTML='';
+  const o0=document.createElement('option');o0.value='';o0.textContent=allLabel;sel.appendChild(o0);
+  for(const[v,l]of items){const o=document.createElement('option');o.value=v;o.textContent=l;sel.appendChild(o)}
+  sel.value=val;
+}
+function buildFilters(){
+  fill($('fg'),GORDER.map(g=>[g,g]),S.g,'ทุกกลุ่มจังหวัด');
+  const ps=[...new Set(E.filter(e=>!S.g||e.g===S.g).map(e=>e.p))].sort(th);
+  fill($('fp'),ps.map(p=>[p,p]),S.p,'ทุกจังหวัด');
+  const as=new Map();E.filter(e=>(!S.g||e.g===S.g)&&(!S.p||e.p===S.p)).forEach(e=>as.set(e.pa,S.p?e.a:e.a+' ('+e.p+')'));
+  fill($('fa'),[...as].sort((x,y)=>th(x[1],y[1])),S.a,'ทุกอำเภอ');
+  const os=E.filter(e=>(!S.g||e.g===S.g)&&(!S.p||e.p===S.p)&&(!S.a||e.pa===S.a)).sort((x,y)=>th(x.n,y.n));
+  fill($('fo'),os.map(e=>[e.i,S.a?e.n:e.n+' · '+e.a+(S.p?'':' '+e.p)]),S.o,'ทุก อปท.');
+}
+$('fg').onchange=e=>{S.g=e.target.value;if(S.p&&S.g&&P2G[S.p]!==S.g)S.p='';S.a='';S.o='';update()};
+$('fp').onchange=e=>{S.p=e.target.value;if(S.p)S.g=P2G[S.p];S.a='';S.o='';update()};
+$('fa').onchange=e=>{S.a=e.target.value;if(S.a){S.p=S.a.split('|')[0];S.g=P2G[S.p]}S.o='';update()};
+$('fo').onchange=e=>{S.o=e.target.value;if(S.o!==''){const t=E[+S.o];S.p=t.p;S.g=t.g;S.a=t.pa}update()};
+$('reset').onclick=()=>{S.g=S.p=S.a=S.o='';L.dev=L.veh='';update()};
+
+/* ---------- drawing helpers ---------- */
+function bars(el,items,{color,click,sel,max}={}){
+  if(!items.length){el.innerHTML='<div class="empty">ไม่มีข้อมูล</div>';return}
+  const mx=max||Math.max(...items.map(x=>x.v),1);
+  el.innerHTML=items.map((x,i)=>`<div class="br${click?' click':''}${sel===x.k?' sel':''}" data-i="${i}" title="${esc(x.l)}: ${fmt(x.v)}"><span class="t">${esc(x.l)}</span><span class="tr"><span class="f" style="display:block;width:${x.v/mx*100}%;--col:${x.c||color||''}"></span></span><span class="n">${fmt(x.v)}</span></div>`).join('');
+  if(click)el.querySelectorAll('.br').forEach(r=>r.onclick=()=>click(items[+r.dataset.i]));
+}
+function cols(el,items,color){
+  const mx=Math.max(...items.map(x=>x.v),1);
+  el.innerHTML=`<div class="cols">${items.map(x=>`<div class="col" title="${esc(x.l)}: ${fmt(x.v)}"><span class="v">${x.v?fmt(x.v):''}</span><span class="b" style="height:${x.v/mx*150}px;--col:${color}"></span></div>`).join('')}</div><div class="lab">${items.map(x=>`<span>${esc(x.s||x.l)}</span>`).join('')}</div>`;
+}
+function donut(el,items){
+  const tot=items.reduce((a,b)=>a+b.v,0)||1;let acc=0;const R=52,C=2*Math.PI*R;
+  const arcs=items.map(x=>{const len=x.v/tot*C;const s=`<circle r="${R}" cx="70" cy="70" fill="none" stroke="${x.c}" stroke-width="22" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-acc}" transform="rotate(-90 70 70)"/>`;acc+=len;return s}).join('');
+  el.innerHTML=`<div class="donut"><svg width="140" height="140" viewBox="0 0 140 140" role="img" aria-label="สัดส่วนเพศ">${arcs}</svg><div class="leg">${items.map(x=>`<div><i style="background:${x.c}"></i>${esc(x.l)} <b>${fmt(x.v)}</b> (${(x.v/tot*100).toFixed(1)}%)</div>`).join('')}</div></div>`;
+}
+function kpi(c,l,v,n){return `<div class="kpi" style="--c:${c}"><div class="l">${l}</div><div class="v">${v}</div><div class="n">${n||'&nbsp;'}</div></div>`}
+function table(el,cols_,rows,sortKey,onSort){
+  el.innerHTML=`<table><thead><tr>${cols_.map((c,i)=>`<th data-k="${c.k}" class="${c.k===sortKey?'s':''}">${esc(c.h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols_.map(c=>`<td title="${c.k==='n'?esc(r[c.k]):''}">${c.k==='n'?esc(r.n):fmt(r[c.k])}</td>`).join('')}</tr>`).join('')||'<tr><td colspan="9" class="empty">ไม่มีข้อมูล</td></tr>'}</tbody></table>`;
+  if(onSort)el.querySelectorAll('th').forEach(h=>h.onclick=()=>{if(h.dataset.k!=='n')onSort(h.dataset.k)});
+}
+
+/* ---------- drill unit ---------- */
+function unitInfo(){
+  if(S.a||S.o!=='')return{k:'อปท.',f:e=>e.i,l:e=>e.n};
+  if(S.p)return{k:'อำเภอ',f:e=>e.pa,l:e=>e.a};
+  if(S.g)return{k:'จังหวัด',f:e=>e.p,l:e=>e.p};
+  return{k:'กลุ่มจังหวัด',f:e=>e.g,l:e=>e.g};
+}
+function byUnit(perEnt){
+  const U=unitInfo(),m=new Map();
+  for(const e of okEnts()){const key=U.f(e);let r=m.get(key);if(!r){r={n:U.l(e),opt:0,v:0};m.set(key,r)}r.opt++;r.v+=perEnt[e.i]}
+  return{U,rows:[...m.values()]};
+}
+
+/* ---------- map ---------- */
+const MAPD=/*MAP*/null;
+const MET={sum:'all'};
+const HUE={all:[30,58,95],vol:[15,118,110],dev:[37,99,235],veh:[217,119,6]};
+function provTotals(fn){const m={};for(const e of E)m[e.p]=(m[e.p]||0)+fn(e.i);return m}
+function drawMap(page,tot,key,label,extra,detail){
+  const el=$('map-'+page);const c=HUE[key],vals=Object.values(tot),mx=Math.max(...vals,1);
+  const col=v=>{const t=Math.sqrt(v/mx),m=(a,b)=>Math.round(232+(a-232)*t*.0+ (232+(b-232)*0)+0);const lo=[226,232,240];return 'rgb('+lo.map((l,i)=>Math.round(l+(c[i]-l)*(v?0.18+0.82*t:0))).join(',')+')'};
+  const paths=MAPD.f.map(f=>{const v=tot[f.p]||0,g=P2G[f.p];const dim=S.g&&g!==S.g;
+    return '<path d="'+f.d+'" data-p="'+esc(f.p)+'" class="'+(S.p===f.p?'sel ':'')+(dim?'dim':'')+'" fill="'+(f.p in tot?col(v):'#eceff3')+'"><title>'+esc(f.p)+': '+(f.p in tot?(detail?detail(f.p):fmt(v)):'ไม่มีข้อมูล')+'</title></path>'}).join('');
+  const seg=extra||'';
+  el.innerHTML='<h2>แผนที่ · '+esc(label)+seg+'</h2><p class="hint">คลิกจังหวัดเพื่อกรอง · คลิกซ้ำเพื่อยกเลิก</p><div class="map"><svg viewBox="0 0 '+MAPD.w+' '+MAPD.h+'" role="img" aria-label="แผนที่ประเทศไทยแสดง'+esc(label)+'รายจังหวัด">'+paths+'</svg></div><div class="mapinfo" id="mi-'+page+'">&nbsp;</div><div class="mleg"><span>0</span><i style="background:linear-gradient(90deg,rgb(226,232,240),rgb('+c.join(',')+'))"></i><span>'+fmt(mx)+'</span></div>';
+  const mi=$('mi-'+page);
+  el.querySelectorAll('path').forEach(p=>{const n=p.dataset.p;
+    p.onmouseenter=()=>mi.innerHTML='<b>'+esc(n)+'</b> · '+(n in tot?(detail?detail(n):fmt(tot[n])):'ไม่มีข้อมูล');
+    p.onmouseleave=()=>mi.innerHTML='&nbsp;';
+    p.onclick=()=>{if(!(n in tot))return;if(S.p===n){S.p='';S.a='';S.o=''}else{S.p=n;S.g=P2G[n];S.a='';S.o=''}update()}});
+  el.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{MET[page]=b.dataset.m;renderPage()});
+}
+
+/* ---------- page: summary ---------- */
+let sumSort='vol';
+function renderSum(){
+  const es=okEnts();let t={vol:0,dev:0,veh:0},has={vol:0,dev:0,veh:0,any:0};
+  for(const e of es){for(const k of['vol','dev','veh']){t[k]+=cnt[k][e.i];if(cnt[k][e.i])has[k]++}
+    if(cnt.vol[e.i]||cnt.dev[e.i]||cnt.veh[e.i])has.any++}
+  $('k-sum').innerHTML=kpi('#64748b','อปท. ทั้งหมด',fmt(es.length),'มีทรัพยากรพร้อมใช้ ≥ 1 ด้าน '+fmt(has.any)+' แห่ง')
+    +kpi(COL.vol,'อปพร. (มีชีวิต)',fmt(t.vol),'คน · เฉลี่ย '+fmt(has.vol?t.vol/has.vol:0)+' คน/อปท.')
+    +kpi(COL.dev,'เครื่องมือ (พร้อมปฏิบัติงาน)',fmt(t.dev),'รายการ · เฉลี่ย '+fmt(has.dev?t.dev/has.dev:0)+'/อปท.')
+    +kpi(COL.veh,'เครื่องจักรกล (พร้อมปฏิบัติงาน)',fmt(t.veh),'คัน/ลำ/เครื่อง · เฉลี่ย '+fmt(has.veh?t.veh/has.veh:0)+'/อปท.');
+  const mk=MET.sum,pv={vol:provTotals(i=>cnt.vol[i]),dev:provTotals(i=>cnt.dev[i]),veh:provTotals(i=>cnt.veh[i])};
+  const ptot=mk==='all'?provTotals(i=>cnt.vol[i]+cnt.dev[i]+cnt.veh[i]):pv[mk];
+  drawMap('sum',ptot,mk,(mk==='all'?'ภาพรวมทรัพยากร (อปพร. + เครื่องมือ + เครื่องจักรกล)':NAME[mk])+' รายจังหวัด','<span class="seg">'+['all','vol','dev','veh'].map(x=>'<button type="button" data-m="'+x+'" aria-pressed="'+(x===mk)+'">'+NAME[x]+'</button>').join('')+'</span>',
+    p=>'อปพร. '+fmt(pv.vol[p]||0)+' · เครื่องมือ '+fmt(pv.dev[p]||0)+' · เครื่องจักรกล '+fmt(pv.veh[p]||0)+(mk==='all'?' · รวม '+fmt(ptot[p]||0):''));
+  // unit table
+  const U=unitInfo(),m=new Map();
+  for(const e of es){const key=U.f(e);let r=m.get(key);if(!r){r={n:U.l(e),opt:0,vol:0,dev:0,veh:0};m.set(key,r)}r.opt++;r.vol+=cnt.vol[e.i];r.dev+=cnt.dev[e.i];r.veh+=cnt.veh[e.i]}
+  $('sum-unit-t').textContent='เปรียบเทียบรายพื้นที่ · จำแนกตาม'+U.k;
+  const rows=[...m.values()].sort((a,b)=>b[sumSort]-a[sumSort]);
+  table($('sum-unit'),[{k:'n',h:U.k},{k:'opt',h:'อปท.'},{k:'vol',h:'อปพร.'},{k:'dev',h:'เครื่องมือ'},{k:'veh',h:'เครื่องจักรกล'}],rows,sumSort,k=>{sumSort=k;renderSum()});
+  // coverage
+  const cv=[['vol','อปพร.'],['dev','เครื่องมือ'],['veh','เครื่องจักรกล']].map(([k,l])=>{const p=es.length?has[k]/es.length*100:0;
+    return `<div class="row"><span>${l}</span><span class="tr" style="background:var(--track);border-radius:4px;height:14px;overflow:hidden"><span style="display:block;height:100%;width:${p}%;background:${COL[k]}"></span></span><b style="text-align:right">${p.toFixed(1)}%</b></div><div style="font-size:12px;color:var(--muted);margin:-8px 0 0 118px">${fmt(has[k])} จาก ${fmt(es.length)} อปท.</div>`}).join('');
+  $('sum-cov').innerHTML=cv;
+  // type
+  const tm={};TYPES.forEach(x=>tm[x]={n:x,opt:0,vol:0,dev:0,veh:0});
+  for(const e of es){const r=tm[e.t]||tm['อื่นๆ'];r.opt++;r.vol+=cnt.vol[e.i];r.dev+=cnt.dev[e.i];r.veh+=cnt.veh[e.i]}
+  table($('sum-type'),[{k:'n',h:'ประเภท'},{k:'opt',h:'อปท.'},{k:'vol',h:'อปพร.'},{k:'dev',h:'เครื่องมือ'},{k:'veh',h:'เครื่องจักรกล'}],Object.values(tm).filter(r=>r.opt));
+  // top
+  const top=es.map(e=>({n:e.n+' ('+e.a+' '+e.p+')',vol:cnt.vol[e.i],dev:cnt.dev[e.i],veh:cnt.veh[e.i],all:cnt.vol[e.i]+cnt.dev[e.i]+cnt.veh[e.i]})).sort((a,b)=>b.all-a.all).slice(0,10);
+  table($('sum-top'),[{k:'n',h:'อปท.'},{k:'vol',h:'อปพร.'},{k:'dev',h:'เครื่องมือ'},{k:'veh',h:'เครื่องจักรกล'},{k:'all',h:'รวม'}],top);
+}
+
+/* ---------- page: อปพร. ---------- */
+function renderVol(){
+  const es=okEnts();let tot=0,sx=[0,0,0],sp={},hasE=0;
+  const per=new Float64Array(N);
+  for(const r of D.vol){if(!ok[r[0]])continue;tot+=r[3];sx[r[1]]+=r[3];const s=D.spec[r[2]];sp[s]=(sp[s]||0)+r[3];per[r[0]]+=r[3]}
+  for(const e of es)if(per[e.i])hasE++;
+  drawMap('vol',provTotals(i=>{let s=0;return cntv[i]}),'vol','จำนวน อปพร. รายจังหวัด');
+  const sxi=n=>sx[D.sex.indexOf(n)];
+  const men=sxi('ชาย'),wom=sxi('หญิง'),unk=sxi('ไม่ระบุ');
+  const known=Object.entries(sp).filter(([k])=>k!=='ไม่ระบุ'&&k!=='อื่นๆ').reduce((a,b)=>a+b[1],0);
+  $('k-vol').innerHTML=kpi(COL.vol,'อปพร. (มีชีวิต)',fmt(tot),'คน')
+    +kpi(COL.vol,'อปท. ที่มี อปพร.',fmt(hasE),'เฉลี่ย '+fmt(hasE?tot/hasE:0)+' คน/อปท.')
+    +kpi(COL.vol,'ชาย',fmt(men),(tot?men/tot*100:0).toFixed(1)+'%')
+    +kpi(COL.vol,'หญิง',fmt(wom),(tot?wom/tot*100:0).toFixed(1)+'%');
+  donut($('vol-sex'),[{l:'ชาย',v:men,c:'#0f766e'},{l:'หญิง',v:wom,c:'#e0a526'},{l:'ไม่ระบุ',v:unk,c:'#b8c2cf'}]);
+  const spItems=Object.entries(sp).filter(([k])=>k!=='ไม่ระบุ').map(([k,v])=>({l:k,v})).sort((a,b)=>b.v-a.v);
+  $('vol-spec-h').textContent='จัดกลุ่มจากข้อความที่กรอก · ไม่ระบุ/ว่าง '+fmt(sp['ไม่ระบุ']||0)+' คน ('+(tot?(sp['ไม่ระบุ']||0)/tot*100:0).toFixed(0)+'%) ไม่แสดงในกราฟ';
+  bars($('vol-spec'),spItems,{color:COL.vol});
+  const {U,rows}=byUnit(per);
+  $('vol-unit-t').textContent='จำนวน อปพร. จำแนกตาม'+U.k;
+  bars($('vol-unit'),rows.map(r=>({l:r.n,v:r.v})).sort((a,b)=>b.v-a.v),{color:COL.vol});
+  const tm={};TYPES.forEach(x=>tm[x]=0);es.forEach(e=>tm[e.t]=(tm[e.t]||0)+per[e.i]);
+  bars($('vol-type'),Object.entries(tm).filter(x=>x[1]).map(([l,v])=>({l,v})),{color:COL.vol});
+  const top=es.map(e=>({n:e.n+' ('+e.a+' '+e.p+')',v:per[e.i]})).sort((a,b)=>b.v-a.v).slice(0,10);
+  table($('vol-top'),[{k:'n',h:'อปท.'},{k:'v',h:'อปพร. (คน)'}],top);
+}
+
+/* ---------- pages: เครื่องมือ / เครื่องจักรกล ---------- */
+const L={dev:'',veh:''};
+const CFG={
+  dev:{d:D.dev,unit:'รายการ',title:'ประเภทอุปกรณ์',sub:'ประเภทย่อย',what:'เครื่องมือ'},
+  veh:{d:D.veh,unit:'รายการ',title:'ประเภทรถ/เรือ/เครื่องจักร',sub:'ประเภทย่อย',what:'เครื่องจักรกล'}
+};
+['dev','veh'].forEach(k=>{$(k+'-root').innerHTML=`
+  <div class="kpis" id="k-${k}"></div>
+  <div id="chip-${k}"></div>
+  <div class="grid">
+    <div class="card c5 r2 mapcard" id="map-${k}"></div>
+    <div class="card c7"><h2>${CFG[k].title}</h2><p class="hint">คลิกแท่งเพื่อกรองเฉพาะประเภทนี้</p><div class="bars" id="${k}-grp"></div></div>
+    <div class="card c7"><h2 id="${k}-sub-t"></h2><div class="bars" id="${k}-sub"></div></div>
+    <div class="card c7"><h2>ปีที่จัดซื้อ (พ.ศ.)</h2><p class="hint" id="${k}-yr-h"></p><div id="${k}-yr"></div></div>
+    <div class="card c5"><h2>ประเภทภัยที่รองรับ</h2><p class="hint">1 รายการรองรับได้หลายภัย จึงนับซ้ำได้</p><div class="bars" id="${k}-haz"></div></div>
+    <div class="card c6"><h2 id="${k}-unit-t"></h2><div class="bars" id="${k}-unit"></div></div>
+    <div class="card c6"><h2>10 อปท. ที่มี${CFG[k].what}มากที่สุด</h2><div class="tw" id="${k}-top"></div></div>
+  </div>`});
+function renderAsset(k){
+  const c=CFG[k],d=c.d,per=new Float64Array(N),gm={},sm={},hm={},ym={};let tot=0,unk=0;
+  for(const r of d.rows){if(!ok[r[0]])continue;const n=r[5],g=d.g[r[1]];
+    gm[g]=(gm[g]||0)+n;
+    if(L[k]&&g!==L[k])continue;
+    tot+=n;per[r[0]]+=n;
+    const s=d.s[r[2]];sm[s]=(sm[s]||0)+n;
+    const y=r[3];const yk=y===0?'ไม่ระบุ':y<2550?'ก่อน 2550':y;ym[yk]=(ym[yk]||0)+n;if(y===0)unk+=n;
+    d.h[r[4]].split(', ').forEach(h=>hm[h]=(hm[h]||0)+n)}
+  {const all=new Float64Array(N);for(const r of d.rows)if(!L[k]||d.g[r[1]]===L[k])all[r[0]]+=r[5];drawMap(k,provTotals(i=>all[i]),k,c.what+(L[k]?' (เฉพาะ '+L[k]+')':'')+' รายจังหวัด')}
+  const es=okEnts();let hasE=0;for(const e of es)if(per[e.i])hasE++;
+  const grpItems=Object.entries(gm).map(([l,v])=>({k:l,l,v})).sort((a,b)=>b.v-a.v);
+  const subItems=Object.entries(sm).map(([l,v])=>({l,v})).sort((a,b)=>b.v-a.v);
+  $('k-'+k).innerHTML=kpi(COL[k],c.what+' (พร้อมปฏิบัติงาน)',fmt(tot),c.unit+(L[k]?' · เฉพาะ '+esc(L[k]):''))
+    +kpi(COL[k],'อปท. ที่มี'+c.what,fmt(hasE),'เฉลี่ย '+fmt(hasE?tot/hasE:0)+' รายการ/อปท.')
+    +kpi(COL[k],c.title,fmt(L[k]?1:grpItems.length),'ประเภท'+(grpItems[0]&&!L[k]?' · มากสุด: '+esc(grpItems[0].l):''))
+    +kpi(COL[k],c.sub,fmt(subItems.length),'ชนิด');
+  $('chip-'+k).innerHTML=L[k]?`<span class="chip">กรองประเภท: ${esc(L[k])} <button type="button" aria-label="ล้างตัวกรองประเภท">×</button></span>`:'';
+  if(L[k])$('chip-'+k).querySelector('button').onclick=()=>{L[k]='';renderAsset(k)};
+  bars($(k+'-grp'),grpItems,{color:COL[k],sel:L[k],click:x=>{L[k]=L[k]===x.k?'':x.k;renderAsset(k)}});
+  $(k+'-sub-t').textContent=c.sub+' (10 อันดับแรก)';
+  bars($(k+'-sub'),subItems.slice(0,10),{color:COL[k]});
+  const yrs=['ก่อน 2550'];for(let y=2550;y<=2569;y++)yrs.push(y);yrs.push('ไม่ระบุ');
+  cols($(k+'-yr'),yrs.map(y=>({l:String(y),s:typeof y==='number'?String(y).slice(2):y==='ก่อน 2550'?'<50':'?',v:ym[y]||0})),COL[k]);
+  $(k+'-yr-h').textContent='ไม่ระบุปี '+fmt(unk)+' รายการ · แสดงเลข พ.ศ. 2 หลักท้าย, "<50" = ก่อน พ.ศ. 2550';
+  bars($(k+'-haz'),Object.entries(hm).map(([l,v])=>({l,v})).sort((a,b)=>b.v-a.v).slice(0,10),{color:COL[k]});
+  const {U,rows}=byUnit(per);
+  $(k+'-unit-t').textContent='จำแนกตาม'+U.k;
+  bars($(k+'-unit'),rows.map(r=>({l:r.n,v:r.v})).sort((a,b)=>b.v-a.v),{color:COL[k]});
+  const top=es.map(e=>({n:e.n+' ('+e.a+' '+e.p+')',v:per[e.i]})).sort((a,b)=>b.v-a.v).slice(0,10);
+  table($(k+'-top'),[{k:'n',h:'อปท.'},{k:'v',h:'จำนวน'}],top);
+}
+
+/* ---------- shell ---------- */
+let page='sum';
+function renderPage(){
+  ({sum:renderSum,vol:renderVol,dev:()=>renderAsset('dev'),veh:()=>renderAsset('veh')})[page]();
+}
+function scopeText(){
+  const parts=[];if(S.g)parts.push('กลุ่มจังหวัด <b>'+esc(S.g)+'</b>');if(S.p)parts.push('จังหวัด <b>'+esc(S.p)+'</b>');
+  if(S.a)parts.push('อำเภอ <b>'+esc(S.a.split('|')[1])+'</b>');if(S.o!=='')parts.push('<b>'+esc(E[+S.o].n)+'</b>');
+  return 'ขอบเขตข้อมูล: '+(parts.length?parts.join(' › '):'<b>ทั่วประเทศ</b> (76 จังหวัด)')+' · '+fmt(okEnts().length)+' อปท.';
+}
+function update(){computeOk();buildFilters();$('scope').innerHTML=scopeText();renderPage()}
+function setPage(p){
+  page=p;document.querySelectorAll('.page').forEach(x=>x.classList.toggle('on',x.id==='p-'+p));
+  document.querySelectorAll('#tabs button').forEach(b=>b.setAttribute('aria-selected',b.dataset.p===p));
+  try{history.replaceState(null,'','#'+p)}catch(e){}
+  renderPage();
+}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>setPage(b.dataset.p));
+$('asof').textContent='ข้อมูล ณ วันที่ '+D.asof+' · เฉพาะสถานะ "มีชีวิต" (อปพร.) และ "พร้อมปฏิบัติงาน" (เครื่องมือ, เครื่องจักรกล)';
+$('note').innerHTML=`<b>หมายเหตุการจัดทำข้อมูล</b><ul>
+<li>ที่มา: DIS001 ข้อมูล อปพร. (${fmt(D.kept.vol)} จาก ${fmt(D.tot.vol)} รายการ) · DIS002 ข้อมูลอุปกรณ์ (${fmt(D.kept.dev)} จาก ${fmt(D.tot.dev)} รายการ) · DIS003 ข้อมูลรถ (${fmt(D.kept.veh)} จาก ${fmt(D.tot.veh)} รายการ) — นับเฉพาะรายการที่สถานะเป็น "มีชีวิต" / "พร้อมปฏิบัติงาน" ส่วนสถานะว่างและ "ไม่พร้อม" ไม่นับ</li>
+<li>รายชื่อ จังหวัด/อำเภอ/อปท. (${fmt(D.E.length)} แห่ง) มาจากไฟล์ "ข้อมูลพื้นฐาน จังหวัด อำเภอ อปท." และกลุ่มจังหวัด (18 กลุ่ม) มาจากไฟล์ "กลุ่มจังหวัด" — ไม่มีกรุงเทพมหานครในข้อมูล</li>
+<li>ชื่อ อปท. ในไฟล์ DIS จับคู่กับรายชื่ออ้างอิงจาก จังหวัด + อำเภอ + ชื่อ (ตัดช่องว่าง) จับคู่ได้ครบทุกแห่ง</li>
+<li>เพศของ อปพร. ระบุจากคำนำหน้าชื่อ (ไม่มีคอลัมน์เพศในต้นทาง) ; ความรู้เฉพาะทางจัดกลุ่มด้วยคำสำคัญจากข้อความอิสระ ; ไม่นำเลขบัตรประชาชนและชื่อบุคคลมาแสดง</li>
+</ul>`;
+const h=location.hash.slice(1);
+update();if(['vol','dev','veh'].includes(h))setPage(h);
+</script>
+</body>
+</html>

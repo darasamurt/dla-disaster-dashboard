@@ -1,0 +1,5 @@
+*.xlsx
+*.xls
+*.jsonl
+node_modules/
+dashboard.html
