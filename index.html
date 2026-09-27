@@ -87,6 +87,8 @@ th.s::after{content:" ▼";font-size:9px}
 .mapinfo{font-size:13px;min-height:20px;margin-top:4px}
 .mleg{display:flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);margin-top:4px}
 .mleg i{flex:1;height:8px;border-radius:4px}
+.assetf{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.assetf .f{min-width:220px;flex:1 1 220px}
 @media (max-width:900px){
   .r2{grid-row:auto}
   .filters .wrap{grid-template-columns:1fr 1fr}
@@ -197,7 +199,7 @@ $('fg').onchange=e=>{S.g=e.target.value;if(S.p&&S.g&&P2G[S.p]!==S.g)S.p='';S.a='
 $('fp').onchange=e=>{S.p=e.target.value;if(S.p)S.g=P2G[S.p];S.a='';S.o='';update()};
 $('fa').onchange=e=>{S.a=e.target.value;if(S.a){S.p=S.a.split('|')[0];S.g=P2G[S.p]}S.o='';update()};
 $('fo').onchange=e=>{S.o=e.target.value;if(S.o!==''){const t=E[+S.o];S.p=t.p;S.g=t.g;S.a=t.pa}update()};
-$('reset').onclick=()=>{S.g=S.p=S.a=S.o='';L.dev=L.veh='';update()};
+$('reset').onclick=()=>{S.g=S.p=S.a=S.o='';L.dev={g:'',s:''};L.veh={g:'',s:''};update()};
 
 /* ---------- drawing helpers ---------- */
 function bars(el,items,{color,click,sel,max}={}){
@@ -315,45 +317,58 @@ function renderVol(){
 }
 
 /* ---------- pages: เครื่องมือ / เครื่องจักรกล ---------- */
-const L={dev:'',veh:''};
+const L={dev:{g:'',s:''},veh:{g:'',s:''}};
 const CFG={
   dev:{d:D.dev,unit:'รายการ',title:'ประเภทอุปกรณ์',sub:'ประเภทย่อย',what:'เครื่องมือ'},
   veh:{d:D.veh,unit:'รายการ',title:'ประเภทรถ/เรือ/เครื่องจักร',sub:'ประเภทย่อย',what:'เครื่องจักรกล'}
 };
 ['dev','veh'].forEach(k=>{$(k+'-root').innerHTML=`
   <div class="kpis" id="k-${k}"></div>
+  <div class="assetf">
+    <div class="f"><label for="${k}-fg">${CFG[k].title}</label><select id="${k}-fg"></select></div>
+    <div class="f"><label for="${k}-fs">${CFG[k].sub}</label><select id="${k}-fs"></select></div>
+  </div>
   <div id="chip-${k}"></div>
   <div class="grid">
     <div class="card c5 r2 mapcard" id="map-${k}"></div>
-    <div class="card c7"><h2>${CFG[k].title}</h2><p class="hint">คลิกแท่งเพื่อกรองเฉพาะประเภทนี้</p><div class="bars" id="${k}-grp"></div></div>
-    <div class="card c7"><h2 id="${k}-sub-t"></h2><div class="bars" id="${k}-sub"></div></div>
+    <div class="card c7"><h2>${CFG[k].title}</h2><p class="hint">คลิกแท่ง หรือใช้ตัวกรองด้านบนเพื่อกรองเฉพาะประเภทนี้</p><div class="bars" id="${k}-grp"></div></div>
+    <div class="card c7"><h2 id="${k}-sub-t"></h2><p class="hint">คลิกแท่งเพื่อกรองเฉพาะ${CFG[k].sub}นี้</p><div class="bars" id="${k}-sub"></div></div>
     <div class="card c7"><h2>ปีที่จัดซื้อ (พ.ศ.)</h2><p class="hint" id="${k}-yr-h"></p><div id="${k}-yr"></div></div>
     <div class="card c5"><h2>ประเภทภัยที่รองรับ</h2><p class="hint">1 รายการรองรับได้หลายภัย จึงนับซ้ำได้</p><div class="bars" id="${k}-haz"></div></div>
     <div class="card c6"><h2 id="${k}-unit-t"></h2><div class="bars" id="${k}-unit"></div></div>
     <div class="card c6"><h2>10 อปท. ที่มี${CFG[k].what}มากที่สุด</h2><div class="tw" id="${k}-top"></div></div>
   </div>`});
 function renderAsset(k){
-  const c=CFG[k],d=c.d,per=new Float64Array(N),gm={},sm={},hm={},ym={};let tot=0,unk=0;
-  for(const r of d.rows){if(!ok[r[0]])continue;const n=r[5],g=d.g[r[1]];
+  const c=CFG[k],d=c.d,f=L[k],per=new Float64Array(N),gm={},sm={},hm={},ym={};let tot=0,unk=0;
+  for(const r of d.rows){if(!ok[r[0]])continue;const g=d.g[r[1]],s=d.s[r[2]],n=r[5];
     gm[g]=(gm[g]||0)+n;
-    if(L[k]&&g!==L[k])continue;
+    if(f.g&&g!==f.g)continue;
+    sm[s]=(sm[s]||0)+n;
+    if(f.s&&s!==f.s)continue;
     tot+=n;per[r[0]]+=n;
-    const s=d.s[r[2]];sm[s]=(sm[s]||0)+n;
     const y=r[3];const yk=y===0?'ไม่ระบุ':y<2550?'ก่อน 2550':y;ym[yk]=(ym[yk]||0)+n;if(y===0)unk+=n;
     d.h[r[4]].split(', ').forEach(h=>hm[h]=(hm[h]||0)+n)}
-  {const all=new Float64Array(N);for(const r of d.rows)if(!L[k]||d.g[r[1]]===L[k])all[r[0]]+=r[5];drawMap(k,provTotals(i=>all[i]),k,c.what+(L[k]?' (เฉพาะ '+L[k]+')':'')+' รายจังหวัด')}
+  {const all=new Float64Array(N);for(const r of d.rows){if(f.g&&d.g[r[1]]!==f.g)continue;if(f.s&&d.s[r[2]]!==f.s)continue;all[r[0]]+=r[5]}
+   const lbl=[f.g,f.s].filter(Boolean).join(' · ');drawMap(k,provTotals(i=>all[i]),k,c.what+(lbl?' (เฉพาะ '+lbl+')':'')+' รายจังหวัด')}
   const es=okEnts();let hasE=0;for(const e of es)if(per[e.i])hasE++;
   const grpItems=Object.entries(gm).map(([l,v])=>({k:l,l,v})).sort((a,b)=>b.v-a.v);
-  const subItems=Object.entries(sm).map(([l,v])=>({l,v})).sort((a,b)=>b.v-a.v);
-  $('k-'+k).innerHTML=kpi(COL[k],c.what+' (พร้อมปฏิบัติงาน)',fmt(tot),c.unit+(L[k]?' · เฉพาะ '+esc(L[k]):''))
+  const subItems=Object.entries(sm).map(([l,v])=>({k:l,l,v})).sort((a,b)=>b.v-a.v);
+  $('k-'+k).innerHTML=kpi(COL[k],c.what+' (พร้อมปฏิบัติงาน)',fmt(tot),c.unit+(f.g||f.s?' · เฉพาะ '+esc([f.g,f.s].filter(Boolean).join(' · ')):''))
     +kpi(COL[k],'อปท. ที่มี'+c.what,fmt(hasE),'เฉลี่ย '+fmt(hasE?tot/hasE:0)+' รายการ/อปท.')
-    +kpi(COL[k],c.title,fmt(L[k]?1:grpItems.length),'ประเภท'+(grpItems[0]&&!L[k]?' · มากสุด: '+esc(grpItems[0].l):''))
-    +kpi(COL[k],c.sub,fmt(subItems.length),'ชนิด');
-  $('chip-'+k).innerHTML=L[k]?`<span class="chip">กรองประเภท: ${esc(L[k])} <button type="button" aria-label="ล้างตัวกรองประเภท">×</button></span>`:'';
-  if(L[k])$('chip-'+k).querySelector('button').onclick=()=>{L[k]='';renderAsset(k)};
-  bars($(k+'-grp'),grpItems,{color:COL[k],sel:L[k],click:x=>{L[k]=L[k]===x.k?'':x.k;renderAsset(k)}});
-  $(k+'-sub-t').textContent=c.sub+' (10 อันดับแรก)';
-  bars($(k+'-sub'),subItems.slice(0,10),{color:COL[k]});
+    +kpi(COL[k],c.title,fmt(f.g?1:grpItems.length),'ประเภท'+(grpItems[0]&&!f.g?' · มากสุด: '+esc(grpItems[0].l):''))
+    +kpi(COL[k],c.sub,fmt(f.s?1:subItems.length),'ชนิด');
+  const chips=[];
+  if(f.g)chips.push(`<span class="chip">ประเภท: ${esc(f.g)} <button type="button" data-x="g" aria-label="ล้างตัวกรองประเภท">×</button></span>`);
+  if(f.s)chips.push(`<span class="chip">ประเภทย่อย: ${esc(f.s)} <button type="button" data-x="s" aria-label="ล้างตัวกรองประเภทย่อย">×</button></span>`);
+  $('chip-'+k).innerHTML=chips.join(' ');
+  $('chip-'+k).querySelectorAll('button').forEach(b=>b.onclick=()=>{f[b.dataset.x]='';if(b.dataset.x==='g')f.s='';renderAsset(k)});
+  fill($(k+'-fg'),grpItems.map(x=>[x.k,x.l+' ('+fmt(x.v)+')']),f.g,'ทุกประเภท');
+  fill($(k+'-fs'),subItems.map(x=>[x.k,x.l+' ('+fmt(x.v)+')']),f.s,'ทุกประเภทย่อย');
+  $(k+'-fg').onchange=e=>{f.g=e.target.value;f.s='';renderAsset(k)};
+  $(k+'-fs').onchange=e=>{f.s=e.target.value;renderAsset(k)};
+  bars($(k+'-grp'),grpItems,{color:COL[k],sel:f.g,click:x=>{f.g=f.g===x.k?'':x.k;f.s='';renderAsset(k)}});
+  $(k+'-sub-t').textContent=c.sub+(f.g?'':' (ทุกประเภท)')+' (10 อันดับแรก)';
+  bars($(k+'-sub'),subItems.slice(0,10),{color:COL[k],sel:f.s,click:x=>{f.s=f.s===x.k?'':x.k;renderAsset(k)}});
   const yrs=['ก่อน 2550'];for(let y=2550;y<=2569;y++)yrs.push(y);yrs.push('ไม่ระบุ');
   cols($(k+'-yr'),yrs.map(y=>({l:String(y),s:typeof y==='number'?String(y).slice(2):y==='ก่อน 2550'?'<50':'?',v:ym[y]||0})),COL[k]);
   $(k+'-yr-h').textContent='ไม่ระบุปี '+fmt(unk)+' รายการ · แสดงเลข พ.ศ. 2 หลักท้าย, "<50" = ก่อน พ.ศ. 2550';
