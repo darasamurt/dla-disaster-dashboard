@@ -52,11 +52,6 @@ h2{font-size:14.5px;margin:0 0 2px;font-weight:600}
 .br .tr{background:var(--track);border-radius:4px;height:14px;overflow:hidden}
 .br .f{height:100%;border-radius:4px;min-width:1px;background:var(--col,var(--dev))}
 .br .n{text-align:right;font-variant-numeric:tabular-nums;font-weight:500}
-.cols{display:flex;align-items:flex-end;gap:3px;height:190px;padding-top:8px;border-bottom:1px solid var(--line)}
-.col{flex:1;min-width:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%}
-.col .b{width:100%;background:var(--col,var(--dev));border-radius:3px 3px 0 0;min-height:1px}
-.col .v{font-size:10px;color:var(--muted);white-space:nowrap;margin-bottom:1px}
-.lab{display:flex;gap:3px;margin-top:3px}.lab span{flex:1;min-width:0;text-align:center;font-size:10.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .donut{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .leg{display:flex;flex-direction:column;gap:5px;font-size:13px}
 .leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:6px}
@@ -89,6 +84,7 @@ th.s::after{content:" ▼";font-size:9px}
 .mleg i{flex:1;height:8px;border-radius:4px}
 .assetf{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .assetf .f{min-width:220px;flex:1 1 220px}
+.searchbox{width:100%;margin:0 0 8px;padding:7px 8px;border:1px solid #c9d2de;border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
 @media (max-width:900px){
   .r2{grid-row:auto}
   .filters .wrap{grid-template-columns:1fr 1fr}
@@ -132,7 +128,7 @@ th.s::after{content:" ▼";font-size:9px}
       <div class="card c7"><h2 id="sum-unit-t"></h2><p class="hint">คลิกหัวคอลัมน์เพื่อเรียงลำดับ</p><div class="tw" id="sum-unit"></div></div>
       <div class="card c7"><h2>ความครอบคลุมของ อปท.</h2><p class="hint">สัดส่วน อปท. ในขอบเขตที่เลือก ที่มีทรัพยากรพร้อมใช้อย่างน้อย 1 รายการ</p><div class="cov" id="sum-cov"></div></div>
       <div class="card c6"><h2>จำแนกตามประเภท อปท.</h2><p class="hint">จำนวน อปท. และทรัพยากรที่พร้อมใช้</p><div id="sum-type"></div></div>
-      <div class="card c6"><h2>10 อปท. ที่มีทรัพยากรรวมสูงสุด</h2><p class="hint">รวม อปพร. + เครื่องมือ + เครื่องจักรกล</p><div class="tw" id="sum-top"></div></div>
+      <div class="card c6"><h2>อปท. ทั้งหมด (เรียงจากทรัพยากรรวมมากไปน้อย)</h2><p class="hint">รวม อปพร. + เครื่องมือ + เครื่องจักรกล</p><input type="search" class="searchbox" id="sum-search" placeholder="ค้นหาชื่อ อปท. / อำเภอ / จังหวัด"><div class="tw" id="sum-top"></div></div>
     </div>
   </section>
 
@@ -144,7 +140,7 @@ th.s::after{content:" ▼";font-size:9px}
       <div class="card c7"><h2>ความรู้เฉพาะทาง</h2><p class="hint" id="vol-spec-h"></p><div class="bars" id="vol-spec"></div></div>
       <div class="card c6"><h2 id="vol-unit-t"></h2><div class="bars" id="vol-unit"></div></div>
       <div class="card c6"><h2>จำแนกตามประเภท อปท.</h2><div class="bars" id="vol-type"></div></div>
-      <div class="card c12"><h2>10 อปท. ที่มี อปพร. มากที่สุด</h2><div class="tw" id="vol-top"></div></div>
+      <div class="card c12"><h2>อปท. ทั้งหมด (เรียงจากจำนวน อปพร. มากไปน้อย)</h2><input type="search" class="searchbox" id="vol-search" placeholder="ค้นหาชื่อ อปท. / อำเภอ / จังหวัด"><div class="tw" id="vol-top"></div></div>
     </div>
   </section>
 
@@ -208,10 +204,6 @@ function bars(el,items,{color,click,sel,max}={}){
   el.innerHTML=items.map((x,i)=>`<div class="br${click?' click':''}${sel===x.k?' sel':''}" data-i="${i}" title="${esc(x.l)}: ${fmt(x.v)}"><span class="t">${esc(x.l)}</span><span class="tr"><span class="f" style="display:block;width:${x.v/mx*100}%;--col:${x.c||color||''}"></span></span><span class="n">${fmt(x.v)}</span></div>`).join('');
   if(click)el.querySelectorAll('.br').forEach(r=>r.onclick=()=>click(items[+r.dataset.i]));
 }
-function cols(el,items,color){
-  const mx=Math.max(...items.map(x=>x.v),1);
-  el.innerHTML=`<div class="cols">${items.map(x=>`<div class="col" title="${esc(x.l)}: ${fmt(x.v)}"><span class="v">${x.v?fmt(x.v):''}</span><span class="b" style="height:${x.v/mx*150}px;--col:${color}"></span></div>`).join('')}</div><div class="lab">${items.map(x=>`<span>${esc(x.s||x.l)}</span>`).join('')}</div>`;
-}
 function donut(el,items){
   const tot=items.reduce((a,b)=>a+b.v,0)||1;let acc=0;const R=52,C=2*Math.PI*R;
   const arcs=items.map(x=>{const len=x.v/tot*C;const s=`<circle r="${R}" cx="70" cy="70" fill="none" stroke="${x.c}" stroke-width="22" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-acc}" transform="rotate(-90 70 70)"/>`;acc+=len;return s}).join('');
@@ -221,6 +213,16 @@ function kpi(c,l,v,n){return `<div class="kpi" style="--c:${c}"><div class="l">$
 function table(el,cols_,rows,sortKey,onSort){
   el.innerHTML=`<table><thead><tr>${cols_.map((c,i)=>`<th data-k="${c.k}" class="${c.k===sortKey?'s':''}">${esc(c.h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols_.map(c=>`<td title="${c.k==='n'?esc(r[c.k]):''}">${c.k==='n'?esc(r.n):fmt(r[c.k])}</td>`).join('')}</tr>`).join('')||'<tr><td colspan="9" class="empty">ไม่มีข้อมูล</td></tr>'}</tbody></table>`;
   if(onSort)el.querySelectorAll('th').forEach(h=>h.onclick=()=>{if(h.dataset.k!=='n')onSort(h.dataset.k)});
+}
+/* full, searchable "อปท. ทั้งหมด" tables — avoids a full page re-render on every keystroke */
+const SRCH={sum:'',vol:'',dev:'',veh:''},TOPROWS={};
+function setTopRows(prefix,rows,cols_){TOPROWS[prefix]={rows,cols_};drawTop(prefix)}
+function drawTop(prefix){
+  const t=TOPROWS[prefix];if(!t)return;
+  const q=SRCH[prefix].trim().toLowerCase();
+  const rows=q?t.rows.filter(r=>r.n.toLowerCase().includes(q)):t.rows;
+  table($(prefix+'-top'),t.cols_,rows);
+  const inp=$(prefix+'-search');if(inp)inp.oninput=e=>{SRCH[prefix]=e.target.value;drawTop(prefix)};
 }
 
 /* ---------- drill unit ---------- */
@@ -285,8 +287,8 @@ function renderSum(){
   for(const e of es){const r=tm[e.t]||tm['อื่นๆ'];r.opt++;r.vol+=cnt.vol[e.i];r.dev+=cnt.dev[e.i];r.veh+=cnt.veh[e.i]}
   table($('sum-type'),[{k:'n',h:'ประเภท'},{k:'opt',h:'อปท.'},{k:'vol',h:'อปพร.'},{k:'dev',h:'เครื่องมือ'},{k:'veh',h:'เครื่องจักรกล'}],Object.values(tm).filter(r=>r.opt));
   // top
-  const top=es.map(e=>({n:e.n+' ('+e.a+' '+e.p+')',vol:cnt.vol[e.i],dev:cnt.dev[e.i],veh:cnt.veh[e.i],all:cnt.vol[e.i]+cnt.dev[e.i]+cnt.veh[e.i]})).sort((a,b)=>b.all-a.all).slice(0,10);
-  table($('sum-top'),[{k:'n',h:'อปท.'},{k:'vol',h:'อปพร.'},{k:'dev',h:'เครื่องมือ'},{k:'veh',h:'เครื่องจักรกล'},{k:'all',h:'รวม'}],top);
+  const top=es.map(e=>({n:e.n+' ('+e.a+' '+e.p+')',vol:cnt.vol[e.i],dev:cnt.dev[e.i],veh:cnt.veh[e.i],all:cnt.vol[e.i]+cnt.dev[e.i]+cnt.veh[e.i]})).sort((a,b)=>b.all-a.all);
+  setTopRows('sum',top,[{k:'n',h:'อปท.'},{k:'vol',h:'อปพร.'},{k:'dev',h:'เครื่องมือ'},{k:'veh',h:'เครื่องจักรกล'},{k:'all',h:'รวม'}]);
 }
 
 /* ---------- page: อปพร. ---------- */
@@ -312,8 +314,8 @@ function renderVol(){
   bars($('vol-unit'),rows.map(r=>({l:r.n,v:r.v})).sort((a,b)=>b.v-a.v),{color:COL.vol});
   const tm={};TYPES.forEach(x=>tm[x]=0);es.forEach(e=>tm[e.t]=(tm[e.t]||0)+per[e.i]);
   bars($('vol-type'),Object.entries(tm).filter(x=>x[1]).map(([l,v])=>({l,v})),{color:COL.vol});
-  const top=es.map(e=>({n:e.n+' ('+e.a+' '+e.p+')',v:per[e.i]})).sort((a,b)=>b.v-a.v).slice(0,10);
-  table($('vol-top'),[{k:'n',h:'อปท.'},{k:'v',h:'อปพร. (คน)'}],top);
+  const top=es.map(e=>({n:e.n+' ('+e.a+' '+e.p+')',v:per[e.i]})).sort((a,b)=>b.v-a.v);
+  setTopRows('vol',top,[{k:'n',h:'อปท.'},{k:'v',h:'อปพร. (คน)'}]);
 }
 
 /* ---------- pages: เครื่องมือ / เครื่องจักรกล ---------- */
@@ -333,20 +335,18 @@ const CFG={
     <div class="card c5 r2 mapcard" id="map-${k}"></div>
     <div class="card c7"><h2>${CFG[k].title}</h2><p class="hint">คลิกแท่ง หรือใช้ตัวกรองด้านบนเพื่อกรองเฉพาะประเภทนี้</p><div class="bars" id="${k}-grp"></div></div>
     <div class="card c7"><h2 id="${k}-sub-t"></h2><p class="hint">คลิกแท่งเพื่อกรองเฉพาะ${CFG[k].sub}นี้</p><div class="bars" id="${k}-sub"></div></div>
-    <div class="card c7"><h2>ปีที่จัดซื้อ (พ.ศ.)</h2><p class="hint" id="${k}-yr-h"></p><div id="${k}-yr"></div></div>
     <div class="card c5"><h2>ประเภทภัยที่รองรับ</h2><p class="hint">1 รายการรองรับได้หลายภัย จึงนับซ้ำได้</p><div class="bars" id="${k}-haz"></div></div>
     <div class="card c6"><h2 id="${k}-unit-t"></h2><div class="bars" id="${k}-unit"></div></div>
-    <div class="card c6"><h2>10 อปท. ที่มี${CFG[k].what}มากที่สุด</h2><div class="tw" id="${k}-top"></div></div>
+    <div class="card c6"><h2>อปท. ทั้งหมด (เรียงจากจำนวนมากไปน้อย)</h2><input type="search" class="searchbox" id="${k}-search" placeholder="ค้นหาชื่อ อปท. / อำเภอ / จังหวัด"><div class="tw" id="${k}-top"></div></div>
   </div>`});
 function renderAsset(k){
-  const c=CFG[k],d=c.d,f=L[k],per=new Float64Array(N),gm={},sm={},hm={},ym={};let tot=0,unk=0;
+  const c=CFG[k],d=c.d,f=L[k],per=new Float64Array(N),gm={},sm={},hm={};let tot=0;
   for(const r of d.rows){if(!ok[r[0]])continue;const g=d.g[r[1]],s=d.s[r[2]],n=r[5];
     gm[g]=(gm[g]||0)+n;
     if(f.g&&g!==f.g)continue;
     sm[s]=(sm[s]||0)+n;
     if(f.s&&s!==f.s)continue;
     tot+=n;per[r[0]]+=n;
-    const y=r[3];const yk=y===0?'ไม่ระบุ':y<2550?'ก่อน 2550':y;ym[yk]=(ym[yk]||0)+n;if(y===0)unk+=n;
     d.h[r[4]].split(', ').forEach(h=>hm[h]=(hm[h]||0)+n)}
   {const all=new Float64Array(N);for(const r of d.rows){if(f.g&&d.g[r[1]]!==f.g)continue;if(f.s&&d.s[r[2]]!==f.s)continue;all[r[0]]+=r[5]}
    const lbl=[f.g,f.s].filter(Boolean).join(' · ');drawMap(k,provTotals(i=>all[i]),k,c.what+(lbl?' (เฉพาะ '+lbl+')':'')+' รายจังหวัด')}
@@ -369,15 +369,12 @@ function renderAsset(k){
   bars($(k+'-grp'),grpItems,{color:COL[k],sel:f.g,click:x=>{f.g=f.g===x.k?'':x.k;f.s='';renderAsset(k)}});
   $(k+'-sub-t').textContent=c.sub+(f.g?'':' (ทุกประเภท)')+' (10 อันดับแรก)';
   bars($(k+'-sub'),subItems.slice(0,10),{color:COL[k],sel:f.s,click:x=>{f.s=f.s===x.k?'':x.k;renderAsset(k)}});
-  const yrs=['ก่อน 2550'];for(let y=2550;y<=2569;y++)yrs.push(y);yrs.push('ไม่ระบุ');
-  cols($(k+'-yr'),yrs.map(y=>({l:String(y),s:typeof y==='number'?String(y).slice(2):y==='ก่อน 2550'?'<50':'?',v:ym[y]||0})),COL[k]);
-  $(k+'-yr-h').textContent='ไม่ระบุปี '+fmt(unk)+' รายการ · แสดงเลข พ.ศ. 2 หลักท้าย, "<50" = ก่อน พ.ศ. 2550';
   bars($(k+'-haz'),Object.entries(hm).map(([l,v])=>({l,v})).sort((a,b)=>b.v-a.v).slice(0,10),{color:COL[k]});
   const {U,rows}=byUnit(per);
   $(k+'-unit-t').textContent='จำแนกตาม'+U.k;
   bars($(k+'-unit'),rows.map(r=>({l:r.n,v:r.v})).sort((a,b)=>b.v-a.v),{color:COL[k]});
-  const top=es.map(e=>({n:e.n+' ('+e.a+' '+e.p+')',v:per[e.i]})).sort((a,b)=>b.v-a.v).slice(0,10);
-  table($(k+'-top'),[{k:'n',h:'อปท.'},{k:'v',h:'จำนวน'}],top);
+  const top=es.map(e=>({n:e.n+' ('+e.a+' '+e.p+')',v:per[e.i]})).sort((a,b)=>b.v-a.v);
+  setTopRows(k,top,[{k:'n',h:'อปท.'},{k:'v',h:'จำนวน'}]);
 }
 
 /* ---------- shell ---------- */
