@@ -33,6 +33,28 @@ select:focus-visible,button:focus-visible{outline:2px solid #4c8dff;outline-offs
 .fbtns{display:flex;gap:8px}
 .reset.dl{background:var(--accent);color:#fff;border-color:var(--accent);white-space:nowrap}
 .reset.dl:hover{background:#274b7a}
+.htop{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.htop .reset.dl{background:#fff;color:var(--accent);border-color:#fff;font-weight:600;flex:none}
+.htop .reset.dl:hover{background:#e7f0ff}
+.crumbs{display:flex;flex-wrap:wrap;align-items:center;gap:4px;font-size:13px;color:var(--muted);margin:0 0 12px}
+.crumb{font:inherit;border:1px solid #c9d2de;background:#fff;border-radius:999px;padding:2px 12px;cursor:pointer;color:var(--ink)}
+.crumb:hover{background:#e7f0ff}.crumb.cur{background:var(--accent);color:#fff;border-color:var(--accent);cursor:default}
+.crumbs .cnt{margin-left:8px}
+.steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:0 0 12px;padding:0;list-style:none;counter-reset:s}
+.steps li{counter-increment:s;background:#fff;border-radius:10px;padding:8px 10px 8px 38px;position:relative;font-size:12.5px;box-shadow:var(--shadow);color:var(--muted)}
+.steps li::before{content:counter(s);position:absolute;left:10px;top:8px;width:20px;height:20px;border-radius:50%;background:var(--accent);color:#fff;text-align:center;font-size:12px;line-height:20px;font-weight:600}
+.steps b{color:var(--ink);display:block;font-size:13px}
+.insight{background:#fff8e6;border:1px solid #f1d98f;border-radius:10px;padding:8px 12px;margin:0 0 12px;font-size:13.5px}
+.kpi.go{cursor:pointer}.kpi.go:hover{background:#f1f5fa}
+.kpi .lk{font-size:11.5px;color:#1d4ed8;margin-top:2px}
+.stack{display:flex;height:22px;border-radius:6px;overflow:hidden;background:var(--track)}
+.stack span{display:block;height:100%}
+.stleg{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;margin:6px 0 10px}
+.stleg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px}
+.gaps{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.gaps button{font:inherit;font-size:12.5px;border:1px solid #f1c27d;background:#fff7ed;color:#9a3412;border-radius:8px;padding:5px 10px;cursor:pointer}
+.gaps button:hover{background:#ffedd5}
+tr.clk td:first-child{color:#1d4ed8}
 main{max-width:1280px;margin:0 auto;padding:16px}
 .scope{font-size:13px;color:var(--muted);margin:0 0 12px}
 .scope b{color:var(--ink)}
@@ -88,12 +110,12 @@ th.s::after{content:" ▼";font-size:9px}
 .assetf{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .assetf .f{min-width:220px;flex:1 1 220px}
 .listbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
-.listbar .mcont{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.listbar .searchbox{margin:0;flex:1 1 240px;width:auto}
 .mcont:empty{display:none}
 .mcont h3{margin:8px 0 4px;font-size:14px}
 .mcont .warn{font-size:12px;color:var(--warn);margin:0 0 6px}
 .mcont a{color:#1d4ed8;text-decoration:none;font-weight:500}
-.searchbox{margin:0;flex:1 1 240px;width:auto}
+.mcont{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
 .tw.tall{max-height:560px}
 th.txt,td.txt{text-align:left}
 th.sa::after{content:" ▲";font-size:9px}
@@ -116,19 +138,20 @@ td.zero{color:#b45309;background:#fff7ed}
   .r2{grid-row:auto}
   .filters .wrap{grid-template-columns:1fr 1fr}
   .fbtns{grid-column:span 2}
+  .steps{grid-template-columns:1fr 1fr}
   .c4,.c5,.c6,.c7,.c8{grid-column:span 12}
   .br{grid-template-columns:minmax(80px,40%) 1fr 56px}
 }
 @media (max-width:520px){
   .filters .wrap{grid-template-columns:1fr}.fbtns{grid-column:auto}
-  h1{font-size:17px}.kpi .v{font-size:24px}
+  h1{font-size:17px}.htop{flex-direction:column}.steps{grid-template-columns:1fr}.kpi .v{font-size:24px}
 }
 </style>
 </head>
 <body>
 <header><div class="wrap">
-  <h1>ทรัพยากรด้านการป้องกันและบรรเทาสาธารณภัย ขององค์กรปกครองส่วนท้องถิ่น</h1>
-  <div class="sub" id="asof"></div>
+  <div class="htop"><div><h1>ทรัพยากรด้านการป้องกันและบรรเทาสาธารณภัย ขององค์กรปกครองส่วนท้องถิ่น</h1>
+  <div class="sub" id="asof"></div></div><button class="reset dl" id="dl-all" type="button" title="ดาวน์โหลดข้อมูลตามตัวกรองที่เลือกเป็นไฟล์ Excel (สรุป → อปพร. → รถ → อุปกรณ์)">⬇ ดาวน์โหลด Excel</button></div>
   <nav role="tablist" id="tabs">
     <button role="tab" data-p="sum" aria-selected="true">1 สรุป</button>
     <button role="tab" data-p="vol" aria-selected="false">2 อปพร.</button>
@@ -142,18 +165,20 @@ td.zero{color:#b45309;background:#fff7ed}
   <div class="f"><label for="fp">จังหวัด</label><select id="fp"></select></div>
   <div class="f"><label for="fa">อำเภอ</label><select id="fa"></select></div>
   <div class="f"><label for="fo">อปท.</label><select id="fo"></select></div>
-  <div class="fbtns"><button class="reset" id="reset" type="button">ล้างตัวกรอง</button><button class="reset dl" id="dl-all" type="button" title="ดาวน์โหลดข้อมูลตามตัวกรองที่เลือกเป็นไฟล์ Excel">⬇ ดาวน์โหลด Excel</button></div>
+  <div class="fbtns"><button class="reset" id="reset" type="button">ล้างตัวกรอง</button></div>
 </div></div>
 
 <main>
-  <p class="scope" id="scope"></p>
+  <div class="crumbs" id="scope"></div>
 
   <section class="page on" id="p-sum">
+    <ol class="steps"><li><b>เลือกพื้นที่</b>คลิกแผนที่ ตัวกรอง หรือแถวในตาราง</li><li><b>ดูว่าขาดอะไร</b>การ์ด "ความครบถ้วน" บอกว่า อปท. ไหนยังไม่มีอะไร</li><li><b>คลิก อปท.</b>ในรายชื่อเพื่อดูรายละเอียดทั้งหมด</li><li><b>ดาวน์โหลด Excel</b>ปุ่มมุมขวาบน ตามพื้นที่ที่เลือก</li></ol>
+    <div class="insight" id="ins-sum"></div>
     <div class="kpis" id="k-sum"></div>
     <div class="grid">
       <div class="card c5 r2 mapcard" id="map-sum"></div>
-      <div class="card c7"><h2 id="sum-unit-t"></h2><p class="hint">คลิกหัวคอลัมน์เพื่อเรียงลำดับ</p><div class="tw" id="sum-unit"></div></div>
-      <div class="card c7"><h2>ความครอบคลุมของ อปท.</h2><p class="hint">สัดส่วน อปท. ในขอบเขตที่เลือก ที่มีทรัพยากรพร้อมใช้อย่างน้อย 1 รายการ</p><div class="cov" id="sum-cov"></div></div>
+      <div class="card c7"><h2 id="sum-unit-t"></h2><p class="hint">คลิกชื่อพื้นที่เพื่อเจาะลึกลงไป · คลิกหัวคอลัมน์เพื่อเรียงลำดับ</p><div class="tw" id="sum-unit"></div></div>
+      <div class="card c7"><h2>ความครบถ้วนของทรัพยากรในแต่ละ อปท.</h2><p class="hint">จำนวน อปท. จำแนกตามว่ามีทรัพยากรครบกี่ด้าน (อปพร. · เครื่องมือ · เครื่องจักรกล) · คลิกปุ่มส้มเพื่อดูรายชื่อ อปท. ที่ยังขาด</p><div id="sum-comp"></div><div class="cov" id="sum-cov"></div></div>
       <div class="card c12"><h2>รายชื่อ อปท. — มีอะไรบ้าง</h2><p class="hint" id="sum-list-h"></p>
         <div class="listbar"><input type="search" class="searchbox" id="sum-search" placeholder="ค้นหาชื่อ อปท. / อำเภอ / จังหวัด">
           <span class="seg" id="sum-flt"><button type="button" data-f="">ทั้งหมด</button><button type="button" data-f="vol">ไม่มี อปพร.</button><button type="button" data-f="dev">ไม่มีเครื่องมือ</button><button type="button" data-f="veh">ไม่มีเครื่องจักรกล</button></span><button type="button" class="reset" id="sum-csv">ดาวน์โหลด Excel</button></div>
@@ -163,14 +188,15 @@ td.zero{color:#b45309;background:#fff7ed}
   </section>
 
   <section class="page" id="p-vol">
+    <div class="insight" id="ins-vol"></div>
     <div class="kpis" id="k-vol"></div>
     <div class="grid">
       <div class="card c5 r2 mapcard" id="map-vol"></div>
       <div class="card c7"><h2>เพศ</h2><p class="hint">ระบุจากคำนำหน้าชื่อ</p><div id="vol-sex"></div></div>
       <div class="card c7"><h2>ความรู้เฉพาะทาง</h2><p class="hint" id="vol-spec-h"></p><div class="bars" id="vol-spec"></div></div>
-      <div class="card c6"><h2 id="vol-unit-t"></h2><div class="bars" id="vol-unit"></div></div>
-      <div class="card c6"><h2>จำแนกตามประเภท อปท.</h2><div class="bars" id="vol-type"></div></div>
       <div class="card c12"><h2>อปท. ทั้งหมด (เรียงจากจำนวน อปพร. มากไปน้อย)</h2><input type="search" class="searchbox" id="vol-search" placeholder="ค้นหาชื่อ อปท. / อำเภอ / จังหวัด · คลิกแถวเพื่อดูรายละเอียด"><div class="tw" id="vol-top"></div></div>
+      <div class="card c6"><h2 id="vol-unit-t"></h2><p class="hint">คลิกแท่งเพื่อเจาะลึกลงไปในพื้นที่นั้น</p><div class="bars" id="vol-unit"></div></div>
+      <div class="card c6"><h2>จำแนกตามประเภท อปท.</h2><div class="bars" id="vol-type"></div></div>
     </div>
   </section>
 
@@ -242,9 +268,9 @@ function donut(el,items){
   const arcs=items.map(x=>{const len=x.v/tot*C;const s=`<circle r="${R}" cx="70" cy="70" fill="none" stroke="${x.c}" stroke-width="22" stroke-dasharray="${len} ${C-len}" stroke-dashoffset="${-acc}" transform="rotate(-90 70 70)"/>`;acc+=len;return s}).join('');
   el.innerHTML=`<div class="donut"><svg width="140" height="140" viewBox="0 0 140 140" role="img" aria-label="สัดส่วนเพศ">${arcs}</svg><div class="leg">${items.map(x=>`<div><i style="background:${x.c}"></i>${esc(x.l)} <b>${fmt(x.v)}</b> (${(x.v/tot*100).toFixed(1)}%)</div>`).join('')}</div></div>`;
 }
-function kpi(c,l,v,n){return `<div class="kpi" style="--c:${c}"><div class="l">${l}</div><div class="v">${v}</div><div class="n">${n||'&nbsp;'}</div></div>`}
+function kpi(c,l,v,n,go){return `<div class="kpi${go?' go':''}"${go?` data-go="${go}" tabindex="0" role="link"`:''} style="--c:${c}"><div class="l">${l}</div><div class="v">${v}</div><div class="n">${n||'&nbsp;'}</div>${go?'<div class="lk">'+(go==='list'?'↓ ดูรายชื่อ':'→ ดูรายละเอียด')+'</div>':''}</div>`}
 function table(el,cols_,rows,sortKey,onSort){
-  el.innerHTML=`<table><thead><tr>${cols_.map((c,i)=>`<th data-k="${c.k}" class="${c.k===sortKey?'s':''}">${esc(c.h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr${r.i!==undefined?` class="clk" tabindex="0" data-i="${r.i}"`:''}>${cols_.map(c=>`<td title="${c.k==='n'?esc(r[c.k]):''}">${c.k==='n'?esc(r.n):fmt(r[c.k])}</td>`).join('')}</tr>`).join('')||'<tr><td colspan="9" class="empty">ไม่มีข้อมูล</td></tr>'}</tbody></table>`;
+  el.innerHTML=`<table><thead><tr>${cols_.map((c,i)=>`<th data-k="${c.k}" class="${c.k===sortKey?'s':''}">${esc(c.h)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr${r.i!==undefined?` class="clk" tabindex="0" data-i="${r.i}"`:r.k!==undefined?` class="clk" tabindex="0" data-k="${esc(r.k)}"`:''}>${cols_.map(c=>`<td title="${c.k==='n'?esc(r[c.k]):''}">${c.k==='n'?esc(r.n):fmt(r[c.k])}</td>`).join('')}</tr>`).join('')||'<tr><td colspan="9" class="empty">ไม่มีข้อมูล</td></tr>'}</tbody></table>`;
   if(onSort)el.querySelectorAll('th').forEach(h=>h.onclick=()=>{if(h.dataset.k!=='n')onSort(h.dataset.k)});
 }
 /* full, searchable "อปท. ทั้งหมด" tables — avoids a full page re-render on every keystroke */
@@ -261,14 +287,22 @@ function drawTop(prefix){
 
 /* ---------- drill unit ---------- */
 function unitInfo(){
-  if(S.a||S.o!=='')return{k:'อปท.',f:e=>e.i,l:e=>e.n};
-  if(S.p)return{k:'อำเภอ',f:e=>e.pa,l:e=>e.a};
-  if(S.g)return{k:'จังหวัด',f:e=>e.p,l:e=>e.p};
-  return{k:'กลุ่มจังหวัด',f:e=>e.g,l:e=>e.g};
+  if(S.a||S.o!=='')return{k:'อปท.',lv:'o',f:e=>e.i,l:e=>e.n};
+  if(S.p)return{k:'อำเภอ',lv:'a',f:e=>e.pa,l:e=>e.a};
+  if(S.g)return{k:'จังหวัด',lv:'p',f:e=>e.p,l:e=>e.p};
+  return{k:'กลุ่มจังหวัด',lv:'g',f:e=>e.g,l:e=>e.g};
+}
+/* เจาะลึกลงพื้นที่ที่คลิก (กลุ่มจังหวัด → จังหวัด → อำเภอ → อปท.) */
+function drill(lv,key){
+  if(lv==='o'){openDetail(+key);return}
+  if(lv==='g'){S.g=key;S.p=S.a=S.o=''}
+  else if(lv==='p'){S.p=key;S.g=P2G[key];S.a=S.o=''}
+  else if(lv==='a'){S.a=key;S.p=key.split('|')[0];S.g=P2G[S.p];S.o=''}
+  update();window.scrollTo({top:0,behavior:'smooth'});
 }
 function byUnit(perEnt){
   const U=unitInfo(),m=new Map();
-  for(const e of okEnts()){const key=U.f(e);let r=m.get(key);if(!r){r={n:U.l(e),opt:0,v:0};m.set(key,r)}r.opt++;r.v+=perEnt[e.i]}
+  for(const e of okEnts()){const key=U.f(e);let r=m.get(key);if(!r){r={n:U.l(e),k:key,opt:0,v:0};m.set(key,r)}r.opt++;r.v+=perEnt[e.i]}
   return{U,rows:[...m.values()]};
 }
 
@@ -358,15 +392,15 @@ function exportAll(){
   const sum=[['ทรัพยากรด้านการป้องกันและบรรเทาสาธารณภัย ขององค์กรปกครองส่วนท้องถิ่น'],['ข้อมูล ณ วันที่ '+D.asof+' · นับเฉพาะ อปพร. สถานะ "มีชีวิต" และเครื่องมือ/เครื่องจักรกลสถานะ "พร้อมปฏิบัติงาน"'],['ขอบเขตข้อมูล: '+scopePlain()+' · '+es.length+' อปท.'],[],
     ['รายการ','จำนวนรวม','อปท. ที่มี','จาก อปท. ทั้งหมด'],['อปพร. (คน)',tv,hv,es.length],['เครื่องมือ (รายการ)',td,hd,es.length],['เครื่องจักรกล (รายการ)',tc,hc,es.length],[],
     [U.k,'อปท.','อปพร. (คน)','เครื่องมือ','เครื่องจักรกล']].concat([...um.values()].sort((x,y)=>th(x.n,y.n)).map(r=>[r.n,r.opt,r.v,r.d,r.c]));
-  // แผ่น 2: รายชื่อ อปท.
-  const lao=[['จังหวัด','กลุ่มจังหวัด','อำเภอ','อปท.','ประเภท อปท.','อปพร. (คน)','เครื่องมือ','เครื่องจักรกล']].concat(es.map(e=>[e.i,e.p,e.g,e.a,e.n,e.t,cnt.vol[e.i],cnt.dev[e.i],cnt.veh[e.i]]).sort(byRank).map(r=>r.slice(1)));
+  {const tm={};TYPES.forEach(x=>tm[x]={n:x,opt:0,v:0,d:0,c:0});for(const e of es){const r=tm[e.t]||tm['อื่นๆ'];r.opt++;r.v+=cnt.vol[e.i];r.d+=cnt.dev[e.i];r.c+=cnt.veh[e.i]}
+   sum.push([],['ประเภท อปท.','อปท.','อปพร. (คน)','เครื่องมือ','เครื่องจักรกล']);Object.values(tm).filter(r=>r.opt).forEach(r=>sum.push([r.n,r.opt,r.v,r.d,r.c]))}
   // แผ่น 3: อปพร.
   const vol=[['จังหวัด','อำเภอ','อปท.','เพศ','ความรู้เฉพาะทาง','จำนวน (คน)']].concat(D.vol.filter(r=>ok[r[0]]).map(r=>[r[0],E[r[0]].p,E[r[0]].a,E[r[0]].n,D.sex[r[1]],D.spec[r[2]],r[3]]).sort(byRank).map(r=>r.slice(1)));
   // แผ่นรายประเภท — รูปแบบเดียวกับไฟล์ตัวอย่าง จ.สตูล/ภูเก็ต: รถ_<ประเภท>, อป_<ประเภท> แถวละ 1 รายการ
   const prov=S.p?'จ.'+S.p:scopePlain();
   const note='ข้อมูลอุปกรณ์/รถ: ระบบ DIS ณ วันที่ '+D.asof+' (เฉพาะสถานะพร้อมปฏิบัติงาน)'+(CT?' | ข้อมูลผู้ประสาน: รายชื่อผู้ปฏิบัติงานด้านสาธารณภัยของ อปท.':'');
   const roles=['นายก อปท.','ปลัด อปท.','ผู้อำนวยการกอง/สำนักที่รับผิดชอบ','เจ้าหน้าที่ผู้รับผิดชอบ'];
-  const used=new Set(['สรุป','รายชื่อ อปท.','อปพร.']);
+  const used=new Set(['สรุป','อปพร.']);
   const uniq=nm=>{let n=nm.slice(0,31),i=2;while(used.has(n))n=nm.slice(0,28)+'_'+i++;used.add(n);return n};
   const itemSheets=k=>{
     const d=CFG[k].d,by=new Map(),isV=k==='veh',pre=isV?'รถ_':'อป_';
@@ -389,8 +423,7 @@ function exportAll(){
     });
   };
   xlsxDownload('dashboard_ทรัพยากรสาธารณภัย_'+scopeName(),[
-    {name:'สรุป',rows:sum,bold:[0,4,9]},
-    {name:'รายชื่อ อปท.',rows:lao,freeze:1,filter:1},
+    {name:'สรุป',rows:sum,bold:[0,4,9,11+um.size]},
     {name:'อปพร.',rows:vol,freeze:1,filter:1}].concat(itemSheets('veh'),itemSheets('dev')));
 }
 $('dl-all').onclick=exportAll;
@@ -477,28 +510,40 @@ $('m-focus').onclick=()=>{const e=E[detailI];S.g=e.g;S.p=e.p;S.a=e.pa;S.o=String
 
 /* ---------- page: summary ---------- */
 let sumSort='vol';
+$('k-sum').onclick=ev=>{const k=ev.target.closest('.kpi[data-go]');if(!k)return;const g=k.dataset.go;if(g==='list')$('sum-top').scrollIntoView({behavior:'smooth',block:'start'});else{setPage(g);window.scrollTo({top:0})}};
 function renderSum(){
   const es=okEnts();let t={vol:0,dev:0,veh:0},has={vol:0,dev:0,veh:0,any:0};
   for(const e of es){for(const k of['vol','dev','veh']){t[k]+=cnt[k][e.i];if(cnt[k][e.i])has[k]++}
     if(cnt.vol[e.i]||cnt.dev[e.i]||cnt.veh[e.i])has.any++}
-  $('k-sum').innerHTML=kpi('#64748b','อปท. ทั้งหมด',fmt(es.length),'มีทรัพยากรพร้อมใช้ ≥ 1 ด้าน '+fmt(has.any)+' แห่ง')
-    +kpi(COL.vol,'อปพร. (มีชีวิต)',fmt(t.vol),'คน · เฉลี่ย '+fmt(has.vol?t.vol/has.vol:0)+' คน/อปท.')
-    +kpi(COL.dev,'เครื่องมือ (พร้อมปฏิบัติงาน)',fmt(t.dev),'รายการ · เฉลี่ย '+fmt(has.dev?t.dev/has.dev:0)+'/อปท.')
-    +kpi(COL.veh,'เครื่องจักรกล (พร้อมปฏิบัติงาน)',fmt(t.veh),'คัน/ลำ/เครื่อง · เฉลี่ย '+fmt(has.veh?t.veh/has.veh:0)+'/อปท.');
+  $('k-sum').innerHTML=kpi('#64748b','อปท. ทั้งหมด',fmt(es.length),'มีทรัพยากรพร้อมใช้ ≥ 1 ด้าน '+fmt(has.any)+' แห่ง','list')
+    +kpi(COL.vol,'อปพร. (มีชีวิต)',fmt(t.vol),'คน · เฉลี่ย '+fmt(has.vol?t.vol/has.vol:0)+' คน/อปท.','vol')
+    +kpi(COL.dev,'เครื่องมือ (พร้อมปฏิบัติงาน)',fmt(t.dev),'รายการ · เฉลี่ย '+fmt(has.dev?t.dev/has.dev:0)+'/อปท.','dev')
+    +kpi(COL.veh,'เครื่องจักรกล (พร้อมปฏิบัติงาน)',fmt(t.veh),'คัน/ลำ/เครื่อง · เฉลี่ย '+fmt(has.veh?t.veh/has.veh:0)+'/อปท.','veh');
   const mk=MET.sum,pv={vol:provTotals(i=>cnt.vol[i]),dev:provTotals(i=>cnt.dev[i]),veh:provTotals(i=>cnt.veh[i])};
   const ptot=mk==='all'?provTotals(i=>cnt.vol[i]+cnt.dev[i]+cnt.veh[i]):pv[mk];
   drawMap('sum',ptot,mk,(mk==='all'?'ภาพรวมทรัพยากร (อปพร. + เครื่องมือ + เครื่องจักรกล)':NAME[mk])+' รายจังหวัด','<span class="seg">'+['all','vol','dev','veh'].map(x=>'<button type="button" data-m="'+x+'" aria-pressed="'+(x===mk)+'">'+NAME[x]+'</button>').join('')+'</span>',
     p=>'อปพร. '+fmt(pv.vol[p]||0)+' · เครื่องมือ '+fmt(pv.dev[p]||0)+' · เครื่องจักรกล '+fmt(pv.veh[p]||0)+(mk==='all'?' · รวม '+fmt(ptot[p]||0):''));
   // unit table
   const U=unitInfo(),m=new Map();
-  for(const e of es){const key=U.f(e);let r=m.get(key);if(!r){r={n:U.l(e),opt:0,vol:0,dev:0,veh:0};m.set(key,r)}r.opt++;r.vol+=cnt.vol[e.i];r.dev+=cnt.dev[e.i];r.veh+=cnt.veh[e.i]}
+  for(const e of es){const key=U.f(e);let r=m.get(key);if(!r){r={n:U.l(e),k:key,opt:0,vol:0,dev:0,veh:0};m.set(key,r)}r.opt++;r.vol+=cnt.vol[e.i];r.dev+=cnt.dev[e.i];r.veh+=cnt.veh[e.i]}
   $('sum-unit-t').textContent='เปรียบเทียบรายพื้นที่ · จำแนกตาม'+U.k;
   const rows=[...m.values()].sort((a,b)=>b[sumSort]-a[sumSort]);
   table($('sum-unit'),[{k:'n',h:U.k},{k:'opt',h:'อปท.'},{k:'vol',h:'อปพร.'},{k:'dev',h:'เครื่องมือ'},{k:'veh',h:'เครื่องจักรกล'}],rows,sumSort,k=>{sumSort=k;renderSum()});
+  $('sum-unit').onclick=ev=>{const tr=ev.target.closest('tr[data-k]');if(tr)drill(U.lv,tr.dataset.k)};
+  $('sum-unit').onkeydown=ev=>{if(ev.key==='Enter'){const tr=ev.target.closest&&ev.target.closest('tr[data-k]');if(tr)drill(U.lv,tr.dataset.k)}};
   // coverage
   const cv=[['vol','อปพร.'],['dev','เครื่องมือ'],['veh','เครื่องจักรกล']].map(([k,l])=>{const p=es.length?has[k]/es.length*100:0;
     return `<div class="row"><span>${l}</span><span class="tr" style="background:var(--track);border-radius:4px;height:14px;overflow:hidden"><span style="display:block;height:100%;width:${p}%;background:${COL[k]}"></span></span><b style="text-align:right">${p.toFixed(1)}%</b></div><div style="font-size:12px;color:var(--muted);margin:-8px 0 0 118px">${fmt(has[k])} จาก ${fmt(es.length)} อปท.</div>`}).join('');
   $('sum-cov').innerHTML=cv;
+  const cc=[0,0,0,0];for(const e of es)cc[(cnt.vol[e.i]>0)+(cnt.dev[e.i]>0)+(cnt.veh[e.i]>0)]++;
+  const CC=[['ครบ 3 ด้าน','#15803d',3],['มี 2 ด้าน','#84cc16',2],['มี 1 ด้าน','#f59e0b',1],['ไม่มีเลย','#dc2626',0]],nE=es.length||1;
+  const gap=k=>es.filter(e=>!cnt[k][e.i]).length;
+  $('sum-comp').innerHTML='<div class="stack" role="img" aria-label="สัดส่วน อปท. ตามจำนวนด้านที่มีทรัพยากร">'+CC.map(([l,c,n])=>'<span style="width:'+cc[n]/nE*100+'%;background:'+c+'" title="'+l+' '+fmt(cc[n])+' แห่ง"></span>').join('')+'</div>'
+    +'<div class="stleg">'+CC.map(([l,c,n])=>'<span><i style="background:'+c+'"></i>'+l+' <b>'+fmt(cc[n])+'</b> แห่ง ('+(cc[n]/nE*100).toFixed(1)+'%)</span>').join('')+'</div>'
+    +'<div class="gaps">'+['vol','dev','veh'].map(k=>'<button type="button" data-gap="'+k+'">ไม่มี'+NAME[k]+' '+fmt(gap(k))+' แห่ง →</button>').join('')+'</div><div style="height:12px"></div>';
+  $('sum-comp').querySelectorAll('[data-gap]').forEach(b=>b.onclick=()=>{LIST.flt=b.dataset.gap;SRCH.sum='';$('sum-search').value='';drawSumList();$('sum-top').scrollIntoView({behavior:'smooth',block:'center'})});
+  const worst=['vol','dev','veh'].map(k=>[k,gap(k)]).sort((a,b)=>b[1]-a[1])[0];
+  $('ins-sum').innerHTML='<b>สรุป:</b> '+esc(scopePlain())+' มี '+fmt(es.length)+' อปท. · ครบทั้ง 3 ด้าน <b>'+fmt(cc[3])+'</b> แห่ง · ยังไม่มีทรัพยากรเลย <b>'+fmt(cc[0])+'</b> แห่ง'+(worst[1]?' · ด้านที่ขาดมากที่สุดคือ <b>'+NAME[worst[0]]+'</b> ('+fmt(worst[1])+' แห่ง)':'');
   // type
   const tm={};TYPES.forEach(x=>tm[x]={n:x,opt:0,vol:0,dev:0,veh:0});
   for(const e of es){const r=tm[e.t]||tm['อื่นๆ'];r.opt++;r.vol+=cnt.vol[e.i];r.dev+=cnt.dev[e.i];r.veh+=cnt.veh[e.i]}
@@ -526,10 +571,11 @@ function renderVol(){
   bars($('vol-spec'),spItems,{color:COL.vol});
   const {U,rows}=byUnit(per);
   $('vol-unit-t').textContent='จำนวน อปพร. จำแนกตาม'+U.k;
-  bars($('vol-unit'),rows.map(r=>({l:r.n,v:r.v})).sort((a,b)=>b.v-a.v),{color:COL.vol});
+  bars($('vol-unit'),rows.map(r=>({l:r.n,k:r.k,v:r.v})).sort((a,b)=>b.v-a.v),{color:COL.vol,click:x=>drill(U.lv,x.k)});
   const tm={};TYPES.forEach(x=>tm[x]=0);es.forEach(e=>tm[e.t]=(tm[e.t]||0)+per[e.i]);
   bars($('vol-type'),Object.entries(tm).filter(x=>x[1]).map(([l,v])=>({l,v})),{color:COL.vol});
   const top=es.map(e=>({i:e.i,n:e.n+' ('+e.a+' '+e.p+')',v:per[e.i]})).sort((a,b)=>b.v-a.v);
+  $('ins-vol').innerHTML='<b>สรุป:</b> '+esc(scopePlain())+' มี อปพร. <b>'+fmt(tot)+'</b> คน ใน <b>'+fmt(hasE)+'</b> จาก '+fmt(es.length)+' อปท. · <b>'+fmt(es.length-hasE)+'</b> แห่งยังไม่มี อปพร.'+(top[0]&&top[0].v?' · มากที่สุด: '+esc(top[0].n)+' '+fmt(top[0].v)+' คน':'')+' · คลิกแท่งหรือแถวด้านล่างเพื่อเจาะลึก';
   setTopRows('vol',top,[{k:'n',h:'อปท.'},{k:'v',h:'อปพร. (คน)'}]);
 }
 
@@ -540,6 +586,7 @@ const CFG={
   veh:{d:D.veh,unit:'รายการ',title:'ประเภทรถ/เรือ/เครื่องจักร',sub:'ประเภทย่อย',what:'เครื่องจักรกล'}
 };
 ['dev','veh'].forEach(k=>{$(k+'-root').innerHTML=`
+  <div class="insight" id="ins-${k}"></div>
   <div class="kpis" id="k-${k}"></div>
   <div class="assetf">
     <div class="f"><label for="${k}-fg">${CFG[k].title}</label><select id="${k}-fg"></select></div>
@@ -554,7 +601,7 @@ const CFG={
     <div class="card c12"><h2>รายชื่อ อปท. ที่มี${CFG[k].what} — มีอะไรบ้าง</h2><p class="hint" id="${k}-list-h"></p>
       <div class="listbar"><input type="search" class="searchbox" id="${k}-search" placeholder="ค้นหาชื่อ อปท. / อำเภอ / จังหวัด / ประเภทย่อย"><button type="button" class="reset" id="${k}-csv">ดาวน์โหลด Excel</button></div>
       <div class="tw tall" id="${k}-top"></div></div>
-    <div class="card c12"><h2 id="${k}-unit-t"></h2><div class="bars" id="${k}-unit"></div></div>
+    <div class="card c12"><h2 id="${k}-unit-t"></h2><p class="hint">คลิกแท่งเพื่อเจาะลึกลงไปในพื้นที่นั้น</p><div class="bars" id="${k}-unit"></div></div>
   </div>`});
 function renderAsset(k){
   const c=CFG[k],d=c.d,f=L[k],per=new Float64Array(N),gm={},sm={},hm={},det=new Map();let tot=0;
@@ -590,7 +637,8 @@ function renderAsset(k){
   bars($(k+'-haz'),Object.entries(hm).map(([l,v])=>({l,v})).sort((a,b)=>b.v-a.v).slice(0,10),{color:COL[k]});
   const {U,rows}=byUnit(per);
   $(k+'-unit-t').textContent='จำแนกตาม'+U.k;
-  bars($(k+'-unit'),rows.map(r=>({l:r.n,v:r.v})).sort((a,b)=>b.v-a.v),{color:COL[k]});
+  bars($(k+'-unit'),rows.map(r=>({l:r.n,k:r.k,v:r.v})).sort((a,b)=>b.v-a.v),{color:COL[k],click:x=>drill(U.lv,x.k)});
+  $('ins-'+k).innerHTML='<b>สรุป:</b> '+esc(scopePlain())+' มี'+c.what+'พร้อมปฏิบัติงาน <b>'+fmt(tot)+'</b> รายการ ใน <b>'+fmt(hasE)+'</b> จาก '+fmt(es.length)+' อปท. · <b>'+fmt(es.length-hasE)+'</b> แห่งยังไม่มี'+(grpItems[0]&&!f.g?' · ประเภทที่มากสุด: '+esc(grpItems[0].l):'')+' · เลือกประเภทด้านบน แล้วดูรายชื่อ อปท. ว่าใครมีอะไร';
   const rowsA=[];for(const e of es){if(!per[e.i])continue;rowsA.push({i:e.i,n:e.n,a:e.a,p:e.p,v:per[e.i],items:[...det.get(e.i)].sort((x,y)=>y[1]-x[1])})}
   AL[k].max=Math.max(1,...rowsA.map(r=>r.v));
   setAssetRows(k,rowsA);
@@ -602,10 +650,12 @@ function renderPage(){
   ({sum:renderSum,vol:renderVol,dev:()=>renderAsset('dev'),veh:()=>renderAsset('veh')})[page]();
 }
 function scopeText(){
-  const parts=[];if(S.g)parts.push('กลุ่มจังหวัด <b>'+esc(S.g)+'</b>');if(S.p)parts.push('จังหวัด <b>'+esc(S.p)+'</b>');
-  if(S.a)parts.push('อำเภอ <b>'+esc(S.a.split('|')[1])+'</b>');if(S.o!=='')parts.push('<b>'+esc(E[+S.o].n)+'</b>');
-  return 'ขอบเขตข้อมูล: '+(parts.length?parts.join(' › '):'<b>ทั่วประเทศ</b> (76 จังหวัด)')+' · '+fmt(okEnts().length)+' อปท.';
+  const L_=[['','ทั้งประเทศ']];
+  if(S.g)L_.push(['g',S.g]);if(S.p)L_.push(['p','จ.'+S.p]);if(S.a)L_.push(['a','อ.'+S.a.split('|')[1]]);if(S.o!=='')L_.push(['o',E[+S.o].n]);
+  return '<span>ขอบเขต:</span>'+L_.map((x,i)=>'<button type="button" class="crumb'+(i===L_.length-1?' cur':'')+'" data-lv="'+x[0]+'">'+esc(x[1])+'</button>').join('<span>›</span>')+'<span class="cnt">'+fmt(okEnts().length)+' อปท. · คลิกชื่อเพื่อย้อนกลับ</span>';
 }
+$('scope').onclick=ev=>{const b=ev.target.closest('.crumb');if(!b)return;const lv=b.dataset.lv;
+  if(lv==='')S.g=S.p=S.a=S.o='';else if(lv==='g')S.p=S.a=S.o='';else if(lv==='p')S.a=S.o='';else if(lv==='a')S.o='';else return;update()};
 function update(){computeOk();buildFilters();$('scope').innerHTML=scopeText();renderPage()}
 function setPage(p){
   page=p;document.querySelectorAll('.page').forEach(x=>x.classList.toggle('on',x.id==='p-'+p));
