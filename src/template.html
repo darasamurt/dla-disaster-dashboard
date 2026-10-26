@@ -85,7 +85,12 @@ th.s::after{content:" ▼";font-size:9px}
 .assetf{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px}
 .assetf .f{min-width:220px;flex:1 1 220px}
 .listbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:8px}
-.listbar .searchbox{margin:0;flex:1 1 240px;width:auto}
+.listbar .mcont{margin-top:12px;border-top:1px solid var(--line);padding-top:10px}
+.mcont:empty{display:none}
+.mcont h3{margin:8px 0 4px;font-size:14px}
+.mcont .warn{font-size:12px;color:var(--warn);margin:0 0 6px}
+.mcont a{color:#1d4ed8;text-decoration:none;font-weight:500}
+.searchbox{margin:0;flex:1 1 240px;width:auto}
 .tw.tall{max-height:560px}
 th.txt,td.txt{text-align:left}
 th.sa::after{content:" ▲";font-size:9px}
@@ -172,10 +177,11 @@ td.zero{color:#b45309;background:#fff7ed}
   <div class="note" id="note"></div>
 </main>
 
-<div class="modal" id="modal" hidden><div class="mbox" role="dialog" aria-modal="true" aria-labelledby="m-title"><div class="mhead"><div><h2 id="m-title"></h2><div class="hint" id="m-sub"></div></div><button type="button" class="reset" id="m-close">ปิด</button></div><div class="mcols" id="m-body"></div><div class="mact"><button type="button" class="reset" id="m-focus">กรองเฉพาะ อปท. นี้ (ใช้กับทุกหน้า)</button></div></div></div>
+<div class="modal" id="modal" hidden><div class="mbox" role="dialog" aria-modal="true" aria-labelledby="m-title"><div class="mhead"><div><h2 id="m-title"></h2><div class="hint" id="m-sub"></div></div><button type="button" class="reset" id="m-close">ปิด</button></div><div class="mcols" id="m-body"></div><div class="mcont" id="m-contacts"></div><div class="mact"><button type="button" class="reset" id="m-focus">กรองเฉพาะ อปท. นี้ (ใช้กับทุกหน้า)</button></div></div></div>
 
 <script>
 const D=/*DATA*/null;
+const CT=/*CONTACTS*/null; // เฉพาะฉบับใช้ภายใน (build-private.js) ฉบับสาธารณะเป็น null
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=n=>Math.round(n).toLocaleString('th-TH');
@@ -338,6 +344,19 @@ function drawSumList(){
   const inp=$('sum-search');inp.oninput=e=>{SRCH.sum=e.target.value;drawSumList()};
   $('sum-csv').onclick=()=>csv('สรุปทรัพยากร_'+scopeName(),['อปท.','อำเภอ','จังหวัด','ประเภท อปท.','อปพร. (คน)','เครื่องมือ','เครื่องจักรกล'],rows.map(r=>[r.n,r.a,r.p,r.t,r.vol,r.dev,r.veh]));
 }
+const tel=s=>{const m=String(s||'').match(/[0-9][0-9\- ]{6,}/);return m?'<a href="tel:'+m[0].replace(/[^0-9]/g,'')+'">'+esc(m[0].trim())+'</a>':''};
+const ctRow=(role,p)=>'<tr><td class="txt">'+esc(role)+'</td><td class="txt">'+esc(p.n||'-')+'</td><td class="txt">'+esc(p.t||'')+'</td><td class="txt">'+(tel(p.tel)||'-')+(p.office?'<br><span class="hint">สำนักงาน '+tel(p.office)+'</span>':'')+'</td><td class="txt">'+esc(p.line||'')+'</td></tr>';
+const ctHead='<table><thead><tr><th class="txt">บทบาท</th><th class="txt">ชื่อ-นามสกุล</th><th class="txt">ตำแหน่ง</th><th class="txt">โทร</th><th class="txt">LINE ID</th></tr></thead><tbody>';
+function contactsHtml(i){
+  const e=E[i],c=CT.laos[i],roles=['นายก อปท.','ปลัด อปท.','ผอ.กอง/สำนักที่รับผิดชอบ','เจ้าหน้าที่ผู้รับผิดชอบ'];
+  let h='<p class="warn">ข้อมูลติดต่อผู้ประสานงาน — ใช้ภายในองค์กรเท่านั้น ห้ามเผยแพร่</p><h3>ผู้ประสานงาน '+esc(e.n)+'</h3>';
+  h+=c?ctHead+c.map((p,k)=>p.n||p.tel?ctRow(roles[k],p):'').join('')+'</tbody></table>':'<p class="hint">ไม่มีข้อมูลผู้ประสานงานของ อปท. นี้ในไฟล์รายชื่อ</p>';
+  const dis=CT.dis[e.p+'|'+e.a];
+  if(dis)h+='<h3>ท้องถิ่นอำเภอ'+esc(e.a)+'</h3>'+ctHead+dis.map(p=>ctRow('ท้องถิ่นอำเภอ',p)).join('')+'</tbody></table>';
+  const pro=CT.pro[e.p];
+  if(pro)h+='<h3>ท้องถิ่นจังหวัด'+esc(e.p)+'</h3>'+ctHead+pro.map(p=>ctRow('ท้องถิ่นจังหวัด',p)).join('')+'</tbody></table>';
+  return h;
+}
 let lastFocus=null,detailI=-1;
 function openDetail(i){
   const e=E[i];detailI=i;lastFocus=document.activeElement;
@@ -350,6 +369,7 @@ function openDetail(i){
   $('m-body').innerHTML='<div class="mcol" style="--c:'+COL.vol+'"><h3>อปพร. (มีชีวิต)</h3><div class="big">'+fmt(vt)+' คน</div>'+(vt?'<div class="ms"><span>ชาย '+fmt(sx['ชาย']||0)+' · หญิง '+fmt(sx['หญิง']||0)+'</span></div><h3 style="margin-top:8px">ความรู้เฉพาะทาง</h3>'+vh:'<p class="hint">ไม่มี อปพร.</p>')+'</div>'
     +'<div class="mcol" style="--c:'+COL.dev+'"><h3>เครื่องมือ (พร้อมปฏิบัติงาน)</h3><div class="big">'+fmt(dv.tot)+' รายการ</div>'+nest(dv)+'</div>'
     +'<div class="mcol" style="--c:'+COL.veh+'"><h3>เครื่องจักรกล (พร้อมปฏิบัติงาน)</h3><div class="big">'+fmt(vc.tot)+' รายการ</div>'+nest(vc)+'</div>';
+  $('m-contacts').innerHTML=CT?contactsHtml(i):'';
   $('modal').hidden=false;$('m-close').focus();
 }
 function closeDetail(){$('modal').hidden=true;if(lastFocus&&lastFocus.focus)lastFocus.focus()}
@@ -504,6 +524,7 @@ $('note').innerHTML=`<b>หมายเหตุการจัดทำข้�
 <li>ชื่อ อปท. ในไฟล์ DIS จับคู่กับรายชื่ออ้างอิงจาก จังหวัด + อำเภอ + ชื่อ (ตัดช่องว่าง) จับคู่ได้ครบทุกแห่ง</li>
 <li>เพศของ อปพร. ระบุจากคำนำหน้าชื่อ (ไม่มีคอลัมน์เพศในต้นทาง) ; ความรู้เฉพาะทางจัดกลุ่มด้วยคำสำคัญจากข้อความอิสระ ; ไม่นำเลขบัตรประชาชนและชื่อบุคคลมาแสดง</li>
 </ul>`;
+if(CT)$('asof').textContent+=' · ฉบับมีข้อมูลติดต่อ — ใช้ภายในองค์กรเท่านั้น ห้ามเผยแพร่';
 const h=location.hash.slice(1);
 update();if(['vol','dev','veh'].includes(h))setPage(h);
 </script>

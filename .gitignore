@@ -3,3 +3,7 @@
 *.jsonl
 node_modules/
 dashboard.html
+
+src/contacts.private.json
+private/
+contacts_x/
