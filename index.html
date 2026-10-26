@@ -148,7 +148,7 @@ td.zero{color:#b45309;background:#fff7ed}
       <div class="card c7"><h2>ความครอบคลุมของ อปท.</h2><p class="hint">สัดส่วน อปท. ในขอบเขตที่เลือก ที่มีทรัพยากรพร้อมใช้อย่างน้อย 1 รายการ</p><div class="cov" id="sum-cov"></div></div>
       <div class="card c12"><h2>รายชื่อ อปท. — มีอะไรบ้าง</h2><p class="hint" id="sum-list-h"></p>
         <div class="listbar"><input type="search" class="searchbox" id="sum-search" placeholder="ค้นหาชื่อ อปท. / อำเภอ / จังหวัด">
-          <span class="seg" id="sum-flt"><button type="button" data-f="">ทั้งหมด</button><button type="button" data-f="vol">ไม่มี อปพร.</button><button type="button" data-f="dev">ไม่มีเครื่องมือ</button><button type="button" data-f="veh">ไม่มีเครื่องจักรกล</button></span></div>
+          <span class="seg" id="sum-flt"><button type="button" data-f="">ทั้งหมด</button><button type="button" data-f="vol">ไม่มี อปพร.</button><button type="button" data-f="dev">ไม่มีเครื่องมือ</button><button type="button" data-f="veh">ไม่มีเครื่องจักรกล</button></span><button type="button" class="reset" id="sum-csv">ดาวน์โหลด CSV</button></div>
         <div class="tw tall" id="sum-top"></div></div>
       <div class="card c12"><h2>จำแนกตามประเภท อปท.</h2><p class="hint">จำนวน อปท. และทรัพยากรที่พร้อมใช้</p><div id="sum-type"></div></div>
     </div>
@@ -283,6 +283,38 @@ function drawMap(page,tot,key,label,extra,detail){
   el.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{MET[page]=b.dataset.m;renderPage()});
 }
 
+/* ---------- CSV (เปิดใน Excel ได้ ภาษาไทยไม่เพี้ยน) ---------- */
+function scopeName(){return S.o!==''?E[+S.o].n:S.a?S.a.split('|')[1]:(S.p||S.g||'ทั้งประเทศ')}
+function csv(name,head,rows){
+  const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
+  const s='\ufeff'+[head].concat(rows).map(r=>r.map(q).join(',')).join('\r\n');
+  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/csv;charset=utf-8'}));a.download=name+'.csv';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+}
+
+/* ---------- รายชื่อ อปท. ที่มีเครื่องมือ/เครื่องจักรกล พร้อมประเภทย่อย ---------- */
+const AL={dev:{rows:[],k:null,d:1},veh:{rows:[],k:null,d:1}};
+function setAssetRows(k,rows){AL[k].rows=rows;drawAssetList(k)}
+function assetFiltered(k){
+  const st=AL[k],key=st.k||(S.p?'a':'v'),d=st.k?st.d:(S.p?1:-1),q=SRCH[k].trim().toLowerCase();
+  let rows=st.rows;
+  if(q)rows=rows.filter(r=>(r.n+' '+r.a+' '+r.p+' '+r.items.map(x=>x[0]).join(' ')).toLowerCase().includes(q));
+  const isTxt=['n','a','p'].includes(key);
+  return{key,d,rows:[...rows].sort((x,y)=>(isTxt?th(x[key],y[key]):x[key]-y[key])*d||th(x.n,y.n))};
+}
+function drawAssetList(k){
+  const st=AL[k],showP=!S.p,{key,d,rows}=assetFiltered(k),f=L[k];
+  const cols_=[{k:'n',h:'อปท.',t:1},{k:'a',h:'อำเภอ',t:1}].concat(showP?[{k:'p',h:'จังหวัด',t:1}]:[],[{k:'det',h:'รายการ (ประเภทย่อย × จำนวน)',t:1,ns:1},{k:'v',h:'รวม'}]);
+  const det=r=>{const sh=r.items.slice(0,6).map(x=>esc(x[0])+' <b>×'+fmt(x[1])+'</b>').join(' · ');return sh+(r.items.length>6?' · <span class="hint">+อีก '+(r.items.length-6)+' ชนิด</span>':'')};
+  $(k+'-top').innerHTML='<table><thead><tr>'+cols_.map(c=>'<th data-k="'+c.k+'" class="'+(c.t?'txt ':'')+(c.k===key?(d>0?'sa':'s'):'')+'">'+c.h+'</th>').join('')+'</tr></thead><tbody>'
+    +(rows.map(r=>'<tr class="clk" tabindex="0" data-i="'+r.i+'">'+cols_.map(c=>c.k==='det'?'<td class="txt" style="font-size:12.5px;white-space:normal;min-width:260px" title="'+esc(r.items.map(x=>x[0]+' ×'+x[1]).join('\n'))+'">'+det(r)+'</td>':c.t?'<td class="txt">'+esc(r[c.k])+'</td>':'<td style="background:rgba('+HUE[k].join(',')+','+(.07+.4*Math.sqrt(r.v/(st.max||1))).toFixed(2)+')">'+fmt(r.v)+'</td>').join('')+'</tr>').join('')||'<tr><td colspan="9" class="empty">ไม่พบ อปท. ตามเงื่อนไข</td></tr>')+'</tbody></table>';
+  $(k+'-top').querySelectorAll('th').forEach(h=>h.onclick=()=>{const kk=h.dataset.k;if(kk==='det')return;if(kk===key){st.k=kk;st.d=-d}else{st.k=kk;st.d=['n','a','p'].includes(kk)?1:-1}drawAssetList(k)});
+  $(k+'-top').onclick=ev=>{const tr=ev.target.closest('tr[data-i]');if(tr)openDetail(+tr.dataset.i)};
+  $(k+'-list-h').textContent='แสดง '+fmt(rows.length)+' จาก '+fmt(st.rows.length)+' อปท. ที่มี'+CFG[k].what+'พร้อมปฏิบัติงาน'+(f.g||f.s?' (เฉพาะ '+[f.g,f.s].filter(Boolean).join(' · ')+')':'')+' · เลือกประเภท/ประเภทย่อยด้านบนเพื่อดูเฉพาะชนิดที่ต้องการ · คลิกแถวเพื่อดูรายละเอียดทั้งหมดของ อปท. นั้น';
+  $(k+'-search').oninput=e=>{SRCH[k]=e.target.value;drawAssetList(k)};
+  $(k+'-csv').onclick=()=>csv(CFG[k].what+'_'+scopeName(),['อปท.','อำเภอ','จังหวัด','ประเภท อปท.','รายการ (ประเภทย่อย × จำนวน)','รวม'],assetFiltered(k).rows.map(r=>[r.n,r.a,r.p,E[r.i].t,r.items.map(x=>x[0]+' ×'+x[1]).join('; '),r.v]));
+}
+
 /* ---------- รายชื่อ อปท. (หน้าสรุป) + รายละเอียดรายแห่ง ---------- */
 const LIST={rows:[],k:null,d:1,flt:''},TXT=['n','a','p','t'];
 function setSumRows(rows){LIST.rows=rows;drawSumList()}
@@ -304,6 +336,7 @@ function drawSumList(){
   $('sum-list-h').textContent='แสดง '+fmt(rows.length)+' จาก '+fmt(LIST.rows.length)+' อปท. ตามขอบเขตที่เลือก · คลิกหัวคอลัมน์เพื่อเรียง · คลิกแถวเพื่อดูว่ามีอะไรบ้าง · ช่อง "ไม่มี" = ไม่มีรายการที่พร้อมใช้ในข้อมูล';
   $('sum-flt').querySelectorAll('button').forEach(b=>{const f=b.dataset.f;b.textContent=f?'ไม่มี'+NAME[f]+' ('+fmt(miss[f])+')':'ทั้งหมด ('+fmt(LIST.rows.length)+')';b.setAttribute('aria-pressed',LIST.flt===f);b.onclick=()=>{LIST.flt=f;drawSumList()}});
   const inp=$('sum-search');inp.oninput=e=>{SRCH.sum=e.target.value;drawSumList()};
+  $('sum-csv').onclick=()=>csv('สรุปทรัพยากร_'+scopeName(),['อปท.','อำเภอ','จังหวัด','ประเภท อปท.','อปพร. (คน)','เครื่องมือ','เครื่องจักรกล'],rows.map(r=>[r.n,r.a,r.p,r.t,r.vol,r.dev,r.veh]));
 }
 let lastFocus=null,detailI=-1;
 function openDetail(i){
@@ -401,17 +434,20 @@ const CFG={
     <div class="card c7"><h2>${CFG[k].title}</h2><p class="hint">คลิกแท่ง หรือใช้ตัวกรองด้านบนเพื่อกรองเฉพาะประเภทนี้</p><div class="bars" id="${k}-grp"></div></div>
     <div class="card c7"><h2 id="${k}-sub-t"></h2><p class="hint">คลิกแท่งเพื่อกรองเฉพาะ${CFG[k].sub}นี้</p><div class="bars" id="${k}-sub"></div></div>
     <div class="card c5"><h2>ประเภทภัยที่รองรับ</h2><p class="hint">1 รายการรองรับได้หลายภัย จึงนับซ้ำได้</p><div class="bars" id="${k}-haz"></div></div>
-    <div class="card c6"><h2 id="${k}-unit-t"></h2><div class="bars" id="${k}-unit"></div></div>
-    <div class="card c6"><h2>อปท. ทั้งหมด (เรียงจากจำนวนมากไปน้อย)</h2><input type="search" class="searchbox" id="${k}-search" placeholder="ค้นหาชื่อ อปท. / อำเภอ / จังหวัด · คลิกแถวเพื่อดูรายละเอียด"><div class="tw" id="${k}-top"></div></div>
+    <div class="card c12"><h2>รายชื่อ อปท. ที่มี${CFG[k].what} — มีอะไรบ้าง</h2><p class="hint" id="${k}-list-h"></p>
+      <div class="listbar"><input type="search" class="searchbox" id="${k}-search" placeholder="ค้นหาชื่อ อปท. / อำเภอ / จังหวัด / ประเภทย่อย"><button type="button" class="reset" id="${k}-csv">ดาวน์โหลด CSV</button></div>
+      <div class="tw tall" id="${k}-top"></div></div>
+    <div class="card c12"><h2 id="${k}-unit-t"></h2><div class="bars" id="${k}-unit"></div></div>
   </div>`});
 function renderAsset(k){
-  const c=CFG[k],d=c.d,f=L[k],per=new Float64Array(N),gm={},sm={},hm={};let tot=0;
+  const c=CFG[k],d=c.d,f=L[k],per=new Float64Array(N),gm={},sm={},hm={},det=new Map();let tot=0;
   for(const r of d.rows){if(!ok[r[0]])continue;const g=d.g[r[1]],s=d.s[r[2]],n=r[5];
     gm[g]=(gm[g]||0)+n;
     if(f.g&&g!==f.g)continue;
     sm[s]=(sm[s]||0)+n;
     if(f.s&&s!==f.s)continue;
     tot+=n;per[r[0]]+=n;
+    let dm=det.get(r[0]);if(!dm){dm=new Map();det.set(r[0],dm)}dm.set(s,(dm.get(s)||0)+n);
     d.h[r[4]].split(', ').forEach(h=>hm[h]=(hm[h]||0)+n)}
   {const all=new Float64Array(N);for(const r of d.rows){if(f.g&&d.g[r[1]]!==f.g)continue;if(f.s&&d.s[r[2]]!==f.s)continue;all[r[0]]+=r[5]}
    const lbl=[f.g,f.s].filter(Boolean).join(' · ');drawMap(k,provTotals(i=>all[i]),k,c.what+(lbl?' (เฉพาะ '+lbl+')':'')+' รายจังหวัด')}
@@ -438,8 +474,9 @@ function renderAsset(k){
   const {U,rows}=byUnit(per);
   $(k+'-unit-t').textContent='จำแนกตาม'+U.k;
   bars($(k+'-unit'),rows.map(r=>({l:r.n,v:r.v})).sort((a,b)=>b.v-a.v),{color:COL[k]});
-  const top=es.map(e=>({i:e.i,n:e.n+' ('+e.a+' '+e.p+')',v:per[e.i]})).sort((a,b)=>b.v-a.v);
-  setTopRows(k,top,[{k:'n',h:'อปท.'},{k:'v',h:'จำนวน'}]);
+  const rowsA=[];for(const e of es){if(!per[e.i])continue;rowsA.push({i:e.i,n:e.n,a:e.a,p:e.p,v:per[e.i],items:[...det.get(e.i)].sort((x,y)=>y[1]-x[1])})}
+  AL[k].max=Math.max(1,...rowsA.map(r=>r.v));
+  setAssetRows(k,rowsA);
 }
 
 /* ---------- shell ---------- */
