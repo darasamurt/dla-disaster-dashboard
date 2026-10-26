@@ -133,7 +133,49 @@ td.zero{color:#b45309;background:#fff7ed}
 .ms{display:flex;justify-content:space-between;gap:8px;padding-left:12px;font-size:12.5px;color:var(--muted)}
 .mact{margin-top:12px;display:flex;gap:8px}
 .searchbox{width:100%;margin:0 0 8px;padding:7px 8px;border:1px solid #c9d2de;border-radius:8px;font:inherit;background:#fff;color:var(--ink)}
+.fsub{display:none}.fsub.on{display:block}
+.findbar{display:flex;flex-wrap:wrap;align-items:center;gap:10px;background:#fff;border-radius:12px;padding:10px 14px;margin:0 0 12px;box-shadow:var(--shadow)}
+.findbar .seg button{padding:6px 16px;font-size:14px}
+.mx{max-height:560px;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.mx table{border-collapse:separate;border-spacing:0;font-size:12.5px;width:max-content;min-width:100%}
+.mx th,.mx td{text-align:center;padding:5px 6px;border-bottom:1px solid #fff;border-right:1px solid #fff;min-width:64px;cursor:default}
+.mx th{position:sticky;background:#f3f5f8;font-size:11.5px;white-space:normal;line-height:1.25;vertical-align:bottom;cursor:pointer}
+.mx thead tr:nth-child(1) th{top:0;z-index:3;cursor:default;color:#fff}
+.mx thead tr:nth-child(2) th{top:26px;z-index:3}
+.mx th.k-vol{background:var(--vol)}.mx th.k-veh{background:var(--veh)}.mx th.k-dev{background:var(--dev)}
+.mx td:first-child,.mx th:first-child{position:sticky;left:0;z-index:2;text-align:left;min-width:150px;background:#fff;font-weight:500;cursor:pointer}
+.mx thead th:first-child{z-index:4;background:#f3f5f8}
+.mx td:first-child{color:#1d4ed8}
+.mx .m0{background:#fecaca;color:#991b1b}.mx .m1{background:#fed7aa;color:#9a3412}.mx .m2{background:#fef08a;color:#713f12}.mx .m3{background:#bbf7d0;color:#14532d}
+.mx tr.tot td{font-weight:700;border-top:2px solid var(--ink);background:#f3f5f8}
+.mxleg{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:12px;margin:0 0 8px;color:var(--muted)}
+.mxleg i{display:inline-block;width:14px;height:12px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.focus{display:flex;flex-direction:column;gap:4px}
+.focus button{font:inherit;display:flex;justify-content:space-between;gap:8px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:5px 10px;cursor:pointer;text-align:left}
+.focus button:hover{background:#eef4ff}.focus b{color:#b91c1c;white-space:nowrap}
+.ptop{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:12px;margin-bottom:12px}
+.pt{font-size:26px;margin:2px 0 4px}.loc{font-size:13.5px;margin-bottom:6px}
+.pbtn{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+details.grp{border-top:1px solid var(--line)}
+details.grp summary{display:grid;grid-template-columns:minmax(120px,28%) 70px 1fr minmax(120px,auto);gap:10px;align-items:center;padding:7px 4px;cursor:pointer;list-style:none}
+details.grp summary::-webkit-details-marker{display:none}
+details.grp summary::before{content:"▸";position:absolute;margin-left:-14px;color:var(--muted)}
+details.grp[open] summary::before{content:"▾"}
+details.grp .gn{font-weight:500}.cvb{display:block;background:var(--track);border-radius:4px;height:12px;overflow:hidden}.cvb span{display:block;height:100%}.cvn{font-size:12px;color:var(--muted);text-align:right}
+.gcols{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:4px 8px 12px;background:#fafbfc;border-radius:8px}
+.gcols h4{margin:6px 0 2px;font-size:13px}
+.ms.hl{cursor:pointer}.ms.hl:hover{background:#eef4ff}
+.gapline{font-size:13px;margin:6px 0;padding:6px 10px;border-radius:8px;background:#fff7ed;border:1px solid #fed7aa}
+.psec{margin-bottom:12px}
+@media print{
+  header,.filters,.crumbs,.noprint,.steps,#note,.insight,.map svg path{display:none!important}
+  body{background:#fff}.page{display:none!important}#p-prof.on{display:block!important}
+  .card{box-shadow:none;border:1px solid #ccc;break-inside:avoid}.kpi{box-shadow:none;border:1px solid #ccc}
+  .ptop{grid-template-columns:1fr}.map{display:none}
+}
 @media (max-width:900px){
+  .ptop{grid-template-columns:1fr}.gcols{grid-template-columns:1fr}
+  details.grp summary{grid-template-columns:1fr 60px}.cvb,.cvn{grid-column:span 2}
   .mcols{grid-template-columns:1fr}
   .r2{grid-row:auto}
   .filters .wrap{grid-template-columns:1fr 1fr}
@@ -153,10 +195,9 @@ td.zero{color:#b45309;background:#fff7ed}
   <div class="htop"><div><h1>ทรัพยากรด้านการป้องกันและบรรเทาสาธารณภัย ขององค์กรปกครองส่วนท้องถิ่น</h1>
   <div class="sub" id="asof"></div></div><button class="reset dl" id="dl-all" type="button" title="ดาวน์โหลดข้อมูลตามตัวกรองที่เลือกเป็นไฟล์ Excel (สรุป → อปพร. → รถ → อุปกรณ์)">⬇ ดาวน์โหลด Excel</button></div>
   <nav role="tablist" id="tabs">
-    <button role="tab" data-p="sum" aria-selected="true">1 สรุป</button>
-    <button role="tab" data-p="vol" aria-selected="false">2 อปพร.</button>
-    <button role="tab" data-p="dev" aria-selected="false">3 เครื่องมือ</button>
-    <button role="tab" data-p="veh" aria-selected="false">4 เครื่องจักรกล</button>
+    <button role="tab" data-p="sum" aria-selected="true">1 ภาพรวม</button>
+    <button role="tab" data-p="find" aria-selected="false">2 ค้นหาของ</button>
+    <button role="tab" data-p="prof" aria-selected="false">3 ใบสรุปพื้นที่</button>
   </nav>
 </div></header>
 
@@ -172,22 +213,26 @@ td.zero{color:#b45309;background:#fff7ed}
   <div class="crumbs" id="scope"></div>
 
   <section class="page on" id="p-sum">
-    <ol class="steps"><li><b>เลือกพื้นที่</b>คลิกแผนที่ ตัวกรอง หรือแถวในตาราง</li><li><b>ดูว่าขาดอะไร</b>การ์ด "ความครบถ้วน" บอกว่า อปท. ไหนยังไม่มีอะไร</li><li><b>คลิก อปท.</b>ในรายชื่อเพื่อดูรายละเอียดทั้งหมด</li><li><b>ดาวน์โหลด Excel</b>ปุ่มมุมขวาบน ตามพื้นที่ที่เลือก</li></ol>
+    <ol class="steps"><li><b>เลือกพื้นที่</b>คลิกแผนที่ ตัวกรอง หรือแถวในตาราง — แถบ "ขอบเขต" บอกว่าอยู่ตรงไหน</li><li><b>ดูตารางสี</b>ช่องสีแดง = พื้นที่ที่ยังไม่มีทรัพยากรนั้น</li><li><b>ค้นหาของ</b>เมนู 2 บอกว่า อปท. ไหนมีอะไร กี่รายการ</li><li><b>ใบสรุปพื้นที่</b>เมนู 3 ได้รายงานหน้าเดียว พิมพ์/ดาวน์โหลดได้</li></ol>
     <div class="insight" id="ins-sum"></div>
     <div class="kpis" id="k-sum"></div>
     <div class="grid">
       <div class="card c5 r2 mapcard" id="map-sum"></div>
-      <div class="card c7"><h2 id="sum-unit-t"></h2><p class="hint">คลิกชื่อพื้นที่เพื่อเจาะลึกลงไป · คลิกหัวคอลัมน์เพื่อเรียงลำดับ</p><div class="tw" id="sum-unit"></div></div>
+      <div class="card c7"><h2>พื้นที่ที่ควรดูก่อน</h2><p class="hint" id="sum-focus-h"></p><div class="focus" id="sum-focus"></div></div>
       <div class="card c7"><h2>ความครบถ้วนของทรัพยากรในแต่ละ อปท.</h2><p class="hint">จำนวน อปท. จำแนกตามว่ามีทรัพยากรครบกี่ด้าน (อปพร. · เครื่องมือ · เครื่องจักรกล) · คลิกปุ่มส้มเพื่อดูรายชื่อ อปท. ที่ยังขาด</p><div id="sum-comp"></div><div class="cov" id="sum-cov"></div></div>
+      <div class="card c12"><h2 id="sum-mx-t">ตารางเปรียบเทียบ — พื้นที่ × ทรัพยากร</h2><p class="hint">แต่ละแถวคือพื้นที่ แต่ละคอลัมน์คือประเภททรัพยากร ตัวเลข = จำนวนที่พร้อมใช้ · สีบอกสัดส่วน อปท. ในพื้นที่นั้นที่มีรายการนี้ · คลิกชื่อแถวเพื่อเจาะลึก · คลิกหัวคอลัมน์เพื่อเรียง · แสดง 10 ประเภทที่มากที่สุดของแต่ละหมวด (ครบทุกประเภทดูที่ "ใบสรุปพื้นที่" หรือไฟล์ Excel)</p>
+        <div class="mxleg"><span><i class="m0" style="background:#fecaca"></i>ไม่มีเลย</span><span><i style="background:#fed7aa"></i>มีน้อย (&lt;⅓ ของ อปท.)</span><span><i style="background:#fef08a"></i>ปานกลาง (⅓–⅔)</span><span><i style="background:#bbf7d0"></i>ครอบคลุมดี (≥⅔)</span></div>
+        <div class="mx" id="sum-mx"></div></div>
       <div class="card c12"><h2>รายชื่อ อปท. — มีอะไรบ้าง</h2><p class="hint" id="sum-list-h"></p>
         <div class="listbar"><input type="search" class="searchbox" id="sum-search" placeholder="ค้นหาชื่อ อปท. / อำเภอ / จังหวัด">
           <span class="seg" id="sum-flt"><button type="button" data-f="">ทั้งหมด</button><button type="button" data-f="vol">ไม่มี อปพร.</button><button type="button" data-f="dev">ไม่มีเครื่องมือ</button><button type="button" data-f="veh">ไม่มีเครื่องจักรกล</button></span><button type="button" class="reset" id="sum-csv">ดาวน์โหลด Excel</button></div>
         <div class="tw tall" id="sum-top"></div></div>
-      <div class="card c12"><h2>จำแนกตามประเภท อปท.</h2><p class="hint">จำนวน อปท. และทรัพยากรที่พร้อมใช้</p><div id="sum-type"></div></div>
-    </div>
+          </div>
   </section>
 
-  <section class="page" id="p-vol">
+  <section class="page" id="p-find">
+    <div class="findbar"><b>ต้องการค้นหา:</b><span class="seg" id="find-seg"><button type="button" data-k="veh">เครื่องจักรกล (รถ/เรือ)</button><button type="button" data-k="dev">เครื่องมือ/อุปกรณ์</button><button type="button" data-k="vol">อปพร.</button></span><span class="hint" style="margin:0">เลือกประเภท → แผนที่บอกว่าอยู่จังหวัดไหน → ตารางด้านล่างบอกว่า อปท. ไหนมี กี่รายการ</span></div>
+  <div class="fsub" id="f-vol">
     <div class="insight" id="ins-vol"></div>
     <div class="kpis" id="k-vol"></div>
     <div class="grid">
@@ -198,10 +243,11 @@ td.zero{color:#b45309;background:#fff7ed}
       <div class="card c6"><h2 id="vol-unit-t"></h2><p class="hint">คลิกแท่งเพื่อเจาะลึกลงไปในพื้นที่นั้น</p><div class="bars" id="vol-unit"></div></div>
       <div class="card c6"><h2>จำแนกตามประเภท อปท.</h2><div class="bars" id="vol-type"></div></div>
     </div>
+  </div>
+  <div class="fsub" id="f-dev"><div id="dev-root"></div></div>
+  <div class="fsub" id="f-veh"><div id="veh-root"></div></div>
   </section>
-
-  <section class="page" id="p-dev"><div id="dev-root"></div></section>
-  <section class="page" id="p-veh"><div id="veh-root"></div></section>
+  <section class="page" id="p-prof"><div id="prof-root"></div></section>
 
   <div class="note" id="note"></div>
 </main>
@@ -228,8 +274,15 @@ D.vol.forEach(r=>cnt.vol[r[0]]+=r[3]);
 D.dev.rows.forEach(r=>cnt.dev[r[0]]+=r[5]);
 D.veh.rows.forEach(r=>cnt.veh[r[0]]+=r[5]);
 const cntv=cnt.vol;
+/* คอลัมน์ทรัพยากรสำหรับตารางเปรียบเทียบ/ใบสรุป: อปพร. + ประเภทรถ + ประเภทอุปกรณ์ (เรียงตามจำนวนทั้งประเทศ) */
+const MXC=[];
+const KIND={vol:'อปพร.',veh:'เครื่องจักรกล',dev:'เครื่องมือ'};
+const COLS=[{kind:'vol',l:'อปพร. (คน)',a:cnt.vol}];
+for(const k of['veh','dev']){const d=D[k],arrs=d.g.map(()=>new Float64Array(N));d.rows.forEach(r=>arrs[r[1]][r[0]]+=r[5]);
+  d.g.map((g,i)=>({kind:k,full:g,l:g.replace(/^กลุ่ม/,'').trim(),a:arrs[i],s:arrs[i].reduce((x,y)=>x+y,0)})).sort((x,y)=>y.s-x.s).forEach(c=>COLS.push(c))}
 const TYPES=['อบจ.','เทศบาลนคร','เทศบาลเมือง','เทศบาลตำบล','อบต.','รูปแบบพิเศษ','อื่นๆ'];
 
+MXC.push(...COLS.filter(c=>c.kind==='vol'),...COLS.filter(c=>c.kind==='veh').slice(0,10),...COLS.filter(c=>c.kind==='dev').slice(0,10));
 /* ---------- filter state ---------- */
 const S={g:'',p:'',a:'',o:''};
 let ok=new Uint8Array(N).fill(1);
@@ -392,8 +445,11 @@ function exportAll(){
   const sum=[['ทรัพยากรด้านการป้องกันและบรรเทาสาธารณภัย ขององค์กรปกครองส่วนท้องถิ่น'],['ข้อมูล ณ วันที่ '+D.asof+' · นับเฉพาะ อปพร. สถานะ "มีชีวิต" และเครื่องมือ/เครื่องจักรกลสถานะ "พร้อมปฏิบัติงาน"'],['ขอบเขตข้อมูล: '+scopePlain()+' · '+es.length+' อปท.'],[],
     ['รายการ','จำนวนรวม','อปท. ที่มี','จาก อปท. ทั้งหมด'],['อปพร. (คน)',tv,hv,es.length],['เครื่องมือ (รายการ)',td,hd,es.length],['เครื่องจักรกล (รายการ)',tc,hc,es.length],[],
     [U.k,'อปท.','อปพร. (คน)','เครื่องมือ','เครื่องจักรกล']].concat([...um.values()].sort((x,y)=>th(x.n,y.n)).map(r=>[r.n,r.opt,r.v,r.d,r.c]));
+  const sumBold=[0,4,9];
   {const tm={};TYPES.forEach(x=>tm[x]={n:x,opt:0,v:0,d:0,c:0});for(const e of es){const r=tm[e.t]||tm['อื่นๆ'];r.opt++;r.v+=cnt.vol[e.i];r.d+=cnt.dev[e.i];r.c+=cnt.veh[e.i]}
-   sum.push([],['ประเภท อปท.','อปท.','อปพร. (คน)','เครื่องมือ','เครื่องจักรกล']);Object.values(tm).filter(r=>r.opt).forEach(r=>sum.push([r.n,r.opt,r.v,r.d,r.c]))}
+   sumBold.push(sum.length+1);sum.push([],['ประเภท อปท.','อปท.','อปพร. (คน)','เครื่องมือ','เครื่องจักรกล']);Object.values(tm).filter(r=>r.opt).forEach(r=>sum.push([r.n,r.opt,r.v,r.d,r.c]))}
+  sumBold.push(sum.length+1);sum.push([],['ทรัพยากร (รายประเภท)','ชนิด','จำนวนรวม','อปท. ที่มี','ร้อยละของ อปท.']);
+  for(const c of COLS){let s=0,h=0;for(const e of es){const x=c.a[e.i];if(x>0){s+=x;h++}}sum.push([c.l,KIND[c.kind],s,h,es.length?Math.round(h/es.length*1000)/10:0])}
   // แผ่น 3: อปพร.
   const vol=[['จังหวัด','อำเภอ','อปท.','เพศ','ความรู้เฉพาะทาง','จำนวน (คน)']].concat(D.vol.filter(r=>ok[r[0]]).map(r=>[r[0],E[r[0]].p,E[r[0]].a,E[r[0]].n,D.sex[r[1]],D.spec[r[2]],r[3]]).sort(byRank).map(r=>r.slice(1)));
   // แผ่นรายประเภท — รูปแบบเดียวกับไฟล์ตัวอย่าง จ.สตูล/ภูเก็ต: รถ_<ประเภท>, อป_<ประเภท> แถวละ 1 รายการ
@@ -423,7 +479,7 @@ function exportAll(){
     });
   };
   xlsxDownload('dashboard_ทรัพยากรสาธารณภัย_'+scopeName(),[
-    {name:'สรุป',rows:sum,bold:[0,4,9,11+um.size]},
+    {name:'สรุป',rows:sum,bold:sumBold},
     {name:'อปพร.',rows:vol,freeze:1,filter:1}].concat(itemSheets('veh'),itemSheets('dev')));
 }
 $('dl-all').onclick=exportAll;
@@ -509,8 +565,27 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('modal').hidden)
 $('m-focus').onclick=()=>{const e=E[detailI];S.g=e.g;S.p=e.p;S.a=e.pa;S.o=String(detailI);$('modal').hidden=true;update()};
 
 /* ---------- page: summary ---------- */
-let sumSort='vol';
-$('k-sum').onclick=ev=>{const k=ev.target.closest('.kpi[data-go]');if(!k)return;const g=k.dataset.go;if(g==='list')$('sum-top').scrollIntoView({behavior:'smooth',block:'start'});else{setPage(g);window.scrollTo({top:0})}};
+let sumSort='vol',mxS={c:-1,d:-1};
+function drawMatrix(es){
+  const U=unitInfo(),m=new Map();
+  for(const e of es){const key=U.f(e);let r=m.get(key);if(!r){r={n:U.l(e),k:key,es:[]};m.set(key,r)}r.es.push(e.i)}
+  const rows=[...m.values()].map(r=>{r.v=MXC.map(c=>{let s=0,h=0;for(const i of r.es){const x=c.a[i];if(x>0){s+=x;h++}}return[s,h]});r.cov=r.v.reduce((a,x)=>a+x[1]/r.es.length,0)/MXC.length;return r});
+  const byCov=[...rows].sort((a,b)=>a.cov-b.cov||th(a.n,b.n));
+  $('sum-focus-h').textContent='เรียงจากพื้นที่ที่ความครอบคลุมเฉลี่ย (ทุกประเภทใน'+'ตาราง) ต่ำสุด · คลิกเพื่อเจาะลึก';
+  $('sum-focus').innerHTML=byCov.slice(0,8).map(r=>'<button type="button" data-k="'+esc(r.k)+'"><span>'+esc(r.n)+' <span class="hint">('+fmt(r.es.length)+' อปท.)</span></span><b>'+(r.cov*100).toFixed(0)+'%</b></button>').join('')||'<div class="empty">ไม่มีข้อมูล</div>';
+  $('sum-focus').onclick=ev=>{const b=ev.target.closest('button[data-k]');if(b)drill(U.lv,b.dataset.k)};
+  const sorted=mxS.c<0?rows.sort((a,b)=>th(a.n,b.n)):rows.sort((a,b)=>(a.v[mxS.c][0]-b.v[mxS.c][0])*mxS.d||th(a.n,b.n));
+  const lv=(h,n)=>!h?'m0':h/n<1/3?'m1':h/n<2/3?'m2':'m3';
+  const kinds=['vol','veh','dev'].map(k=>[k,MXC.filter(c=>c.kind===k).length]);
+  let h='<table><thead><tr><th rowspan="2" data-c="-1">'+esc(U.k)+' ('+fmt(rows.length)+')</th>'+kinds.map(([k,n])=>'<th class="k-'+k+'" colspan="'+n+'">'+KIND[k]+'</th>').join('')+'</tr><tr>'+MXC.map((c,i)=>'<th data-c="'+i+'" title="เรียงตามจำนวน">'+esc(c.l)+(mxS.c===i?(mxS.d<0?' ▼':' ▲'):'')+'</th>').join('')+'</tr></thead><tbody>';
+  for(const r of sorted)h+='<tr data-k="'+esc(r.k)+'"><td>'+esc(r.n)+'</td>'+r.v.map(([s,c])=>'<td class="'+lv(c,r.es.length)+'" title="'+esc(r.n)+': '+fmt(s)+' ('+fmt(c)+' จาก '+fmt(r.es.length)+' อปท. มี)">'+(s?fmt(s):'–')+'</td>').join('')+'</tr>';
+  const tot=MXC.map((c,i)=>rows.reduce((a,r)=>[a[0]+r.v[i][0],a[1]+r.v[i][1]],[0,0]));
+  h+='<tr class="tot"><td>รวม</td>'+tot.map(([s,c])=>'<td class="'+lv(c,es.length)+'">'+fmt(s)+'</td>').join('')+'</tr></tbody></table>';
+  const el=$('sum-mx');el.innerHTML=h;
+  el.onclick=ev=>{const th_=ev.target.closest('th[data-c]');if(th_){const c=+th_.dataset.c;if(c<0)mxS={c:-1,d:-1};else mxS={c,d:mxS.c===c?-mxS.d:-1};drawMatrix(es);return}
+    const tr=ev.target.closest('tr[data-k]');if(tr&&ev.target.closest('td:first-child'))drill(U.lv,tr.dataset.k)};
+}
+$('k-sum').onclick=ev=>{const k=ev.target.closest('.kpi[data-go]');if(!k)return;const g=k.dataset.go;if(g==='list')$('sum-top').scrollIntoView({behavior:'smooth',block:'start'});else{fk=g;setPage('find');window.scrollTo({top:0})}};
 function renderSum(){
   const es=okEnts();let t={vol:0,dev:0,veh:0},has={vol:0,dev:0,veh:0,any:0};
   for(const e of es){for(const k of['vol','dev','veh']){t[k]+=cnt[k][e.i];if(cnt[k][e.i])has[k]++}
@@ -523,14 +598,7 @@ function renderSum(){
   const ptot=mk==='all'?provTotals(i=>cnt.vol[i]+cnt.dev[i]+cnt.veh[i]):pv[mk];
   drawMap('sum',ptot,mk,(mk==='all'?'ภาพรวมทรัพยากร (อปพร. + เครื่องมือ + เครื่องจักรกล)':NAME[mk])+' รายจังหวัด','<span class="seg">'+['all','vol','dev','veh'].map(x=>'<button type="button" data-m="'+x+'" aria-pressed="'+(x===mk)+'">'+NAME[x]+'</button>').join('')+'</span>',
     p=>'อปพร. '+fmt(pv.vol[p]||0)+' · เครื่องมือ '+fmt(pv.dev[p]||0)+' · เครื่องจักรกล '+fmt(pv.veh[p]||0)+(mk==='all'?' · รวม '+fmt(ptot[p]||0):''));
-  // unit table
-  const U=unitInfo(),m=new Map();
-  for(const e of es){const key=U.f(e);let r=m.get(key);if(!r){r={n:U.l(e),k:key,opt:0,vol:0,dev:0,veh:0};m.set(key,r)}r.opt++;r.vol+=cnt.vol[e.i];r.dev+=cnt.dev[e.i];r.veh+=cnt.veh[e.i]}
-  $('sum-unit-t').textContent='เปรียบเทียบรายพื้นที่ · จำแนกตาม'+U.k;
-  const rows=[...m.values()].sort((a,b)=>b[sumSort]-a[sumSort]);
-  table($('sum-unit'),[{k:'n',h:U.k},{k:'opt',h:'อปท.'},{k:'vol',h:'อปพร.'},{k:'dev',h:'เครื่องมือ'},{k:'veh',h:'เครื่องจักรกล'}],rows,sumSort,k=>{sumSort=k;renderSum()});
-  $('sum-unit').onclick=ev=>{const tr=ev.target.closest('tr[data-k]');if(tr)drill(U.lv,tr.dataset.k)};
-  $('sum-unit').onkeydown=ev=>{if(ev.key==='Enter'){const tr=ev.target.closest&&ev.target.closest('tr[data-k]');if(tr)drill(U.lv,tr.dataset.k)}};
+  drawMatrix(es);
   // coverage
   const cv=[['vol','อปพร.'],['dev','เครื่องมือ'],['veh','เครื่องจักรกล']].map(([k,l])=>{const p=es.length?has[k]/es.length*100:0;
     return `<div class="row"><span>${l}</span><span class="tr" style="background:var(--track);border-radius:4px;height:14px;overflow:hidden"><span style="display:block;height:100%;width:${p}%;background:${COL[k]}"></span></span><b style="text-align:right">${p.toFixed(1)}%</b></div><div style="font-size:12px;color:var(--muted);margin:-8px 0 0 118px">${fmt(has[k])} จาก ${fmt(es.length)} อปท.</div>`}).join('');
@@ -544,10 +612,6 @@ function renderSum(){
   $('sum-comp').querySelectorAll('[data-gap]').forEach(b=>b.onclick=()=>{LIST.flt=b.dataset.gap;SRCH.sum='';$('sum-search').value='';drawSumList();$('sum-top').scrollIntoView({behavior:'smooth',block:'center'})});
   const worst=['vol','dev','veh'].map(k=>[k,gap(k)]).sort((a,b)=>b[1]-a[1])[0];
   $('ins-sum').innerHTML='<b>สรุป:</b> '+esc(scopePlain())+' มี '+fmt(es.length)+' อปท. · ครบทั้ง 3 ด้าน <b>'+fmt(cc[3])+'</b> แห่ง · ยังไม่มีทรัพยากรเลย <b>'+fmt(cc[0])+'</b> แห่ง'+(worst[1]?' · ด้านที่ขาดมากที่สุดคือ <b>'+NAME[worst[0]]+'</b> ('+fmt(worst[1])+' แห่ง)':'');
-  // type
-  const tm={};TYPES.forEach(x=>tm[x]={n:x,opt:0,vol:0,dev:0,veh:0});
-  for(const e of es){const r=tm[e.t]||tm['อื่นๆ'];r.opt++;r.vol+=cnt.vol[e.i];r.dev+=cnt.dev[e.i];r.veh+=cnt.veh[e.i]}
-  table($('sum-type'),[{k:'n',h:'ประเภท'},{k:'opt',h:'อปท.'},{k:'vol',h:'อปพร.'},{k:'dev',h:'เครื่องมือ'},{k:'veh',h:'เครื่องจักรกล'}],Object.values(tm).filter(r=>r.opt));
   setSumRows(es.map(e=>({i:e.i,n:e.n,a:e.a,p:e.p,t:e.t,vol:cnt.vol[e.i],dev:cnt.dev[e.i],veh:cnt.veh[e.i],all:cnt.vol[e.i]+cnt.dev[e.i]+cnt.veh[e.i]})));
 }
 
@@ -644,11 +708,70 @@ function renderAsset(k){
   setAssetRows(k,rowsA);
 }
 
-/* ---------- shell ---------- */
-let page='sum';
-function renderPage(){
-  ({sum:renderSum,vol:renderVol,dev:()=>renderAsset('dev'),veh:()=>renderAsset('veh')})[page]();
+/* ---------- page: ใบสรุปพื้นที่ ---------- */
+function profContacts(){
+  if(!CT)return '';
+  if(S.o!=='')return contactsHtml(+S.o);
+  let h='';
+  if(S.a&&CT.dis[S.a])h+='<h3>ท้องถิ่นอำเภอ'+esc(S.a.split('|')[1])+'</h3>'+ctHead+CT.dis[S.a].map(p=>ctRow('ท้องถิ่นอำเภอ',p)).join('')+'</tbody></table>';
+  if(S.p&&CT.pro[S.p])h+='<h3>ท้องถิ่นจังหวัด'+esc(S.p)+'</h3>'+ctHead+CT.pro[S.p].map(p=>ctRow('ท้องถิ่นจังหวัด',p)).join('')+'</tbody></table>';
+  return '<p class="warn">ข้อมูลติดต่อ — ใช้ภายในองค์กรเท่านั้น ห้ามเผยแพร่</p>'+(h||'<p class="hint">เลือกจังหวัด อำเภอ หรือ อปท. ที่ตัวกรองด้านบนเพื่อดูรายชื่อผู้ประสานงาน</p>');
 }
+function renderProf(){
+  const es=okEnts(),n=es.length,single=S.o!=='',U=unitInfo();
+  const title=single?E[+S.o].n:S.a?'อำเภอ'+S.a.split('|')[1]:S.p?'จังหวัด'+S.p:S.g?S.g:'ทั้งประเทศ';
+  const tot={vol:0,dev:0,veh:0},has={vol:0,dev:0,veh:0};
+  for(const e of es)for(const k in tot){tot[k]+=cnt[k][e.i];if(cnt[k][e.i])has[k]++}
+  const sub={veh:new Map(),dev:new Map()};
+  for(const k of['veh','dev']){const d=D[k];for(const r of d.rows){if(!ok[r[0]])continue;const g=d.g[r[1]],s=d.s[r[2]];let m=sub[k].get(g);if(!m){m=new Map();sub[k].set(g,m)}m.set(s,(m.get(s)||0)+r[5])}}
+  const sx={},sp={};for(const r of D.vol){if(!ok[r[0]])continue;const a=D.sex[r[1]],b=D.spec[r[2]];sx[a]=(sx[a]||0)+r[3];sp[b]=(sp[b]||0)+r[3]}
+  const pct=x=>n?Math.round(x.h.length/n*100):0;
+  const sec=k=>{
+    const arr=COLS.filter(c=>c.kind===k).map(c=>{let s=0;const h=[];for(const e of es){const x=c.a[e.i];if(x>0){s+=x;h.push([e.i,x])}}return{c,s,h}}).sort((a,b)=>b.s-a.s);
+    const body=arr.filter(x=>x.s>0).map(x=>{
+      const subs=[...(sub[k].get(x.c.full)||[])].sort((a,b)=>b[1]-a[1]),hold=x.h.sort((a,b)=>b[1]-a[1]);
+      return '<details class="grp"><summary><span class="gn">'+esc(x.c.l)+'</span><b>'+fmt(x.s)+'</b><span class="cvb"><span style="width:'+pct(x)+'%;background:'+COL[k]+'"></span></span><span class="cvn">'+(single?'':fmt(x.h.length)+'/'+fmt(n)+' อปท. ('+pct(x)+'%)')+'</span></summary>'
+        +'<div class="gcols"><div><h4>ประเภทย่อย</h4>'+subs.map(([s,c])=>'<div class="ms"><span>'+esc(s)+'</span><span>'+fmt(c)+'</span></div>').join('')+'</div>'
+        +(single?'':'<div><h4>อยู่ที่ไหน ('+fmt(hold.length)+' อปท.) · คลิกเพื่อดูรายละเอียด</h4>'+hold.slice(0,40).map(([i,c])=>'<div class="ms hl" data-i="'+i+'"><span>'+esc(E[i].n)+' <span class="hint">อ.'+esc(E[i].a)+(S.p?'':' จ.'+esc(E[i].p))+'</span></span><span>'+fmt(c)+'</span></div>').join('')+(hold.length>40?'<div class="hint">…และอีก '+fmt(hold.length-40)+' แห่ง (ดูครบในไฟล์ Excel)</div>':'')+'</div>')
+        +'</div></details>';
+    }).join('');
+    const none=arr.filter(x=>!x.s).map(x=>esc(x.c.l)),few=single?[]:arr.filter(x=>x.s&&pct(x)<50).map(x=>esc(x.c.l)+' ('+pct(x)+'%)');
+    return '<div class="card c12 psec"><h2 style="color:'+COL[k]+'">'+KIND[k]+' — รวม '+fmt(k==='vol'?tot.vol:tot[k])+(k==='vol'?' คน':' รายการ')+'</h2><p class="hint">คลิกแถวเพื่อดูประเภทย่อย'+(single?'':' และรายชื่อ อปท. ที่มี')+'</p>'+(body||'<div class="empty">ไม่มีรายการที่พร้อมใช้</div>')
+      +(none.length?'<div class="gapline"><b>ไม่มีเลยในพื้นที่นี้:</b> '+none.join(' · ')+'</div>':'')+(few.length?'<div class="gapline"><b>มีน้อย (&lt;50% ของ อปท.):</b> '+few.join(' · ')+'</div>':'')+'</div>';
+  };
+  const vsec='<div class="card c12 psec"><h2 style="color:'+COL.vol+'">อปพร. (มีชีวิต) — รวม '+fmt(tot.vol)+' คน</h2><p class="hint">'+(single?'':'มีใน '+fmt(has.vol)+' จาก '+fmt(n)+' อปท. · ')+'ชาย '+fmt(sx['ชาย']||0)+' · หญิง '+fmt(sx['หญิง']||0)+' · ไม่ระบุ '+fmt(sx['ไม่ระบุ']||0)+'</p><div class="bars" id="prof-spec"></div></div>';
+  const miss=k=>n-has[k];
+  const gaps=single?['vol','dev','veh'].filter(k=>!tot[k]).map(k=>NAME[k]):['vol','dev','veh'].filter(k=>miss(k)).map(k=>NAME[k]+' '+fmt(miss(k))+' แห่ง');
+  $('prof-root').innerHTML='<div class="ptop"><div class="card"><div class="hint">ใบสรุปทรัพยากรด้านการป้องกันและบรรเทาสาธารณภัย</div><h2 class="pt">'+esc(title)+'</h2>'
+    +'<div class="loc"><b>ที่ตั้ง:</b> '+(scopePlain())+(single?' · '+esc(E[+S.o].t):'')+'</div><div class="hint">ข้อมูล ณ วันที่ '+esc(D.asof)+' · '+fmt(n)+' อปท. · เฉพาะ อปพร. มีชีวิต และเครื่องมือ/เครื่องจักรกลพร้อมปฏิบัติงาน</div>'
+    +'<div class="gapline" style="margin-top:10px">'+(gaps.length?'<b>'+(single?'ยังไม่มี':'อปท. ที่ยังไม่มี')+':</b> '+gaps.join(' · '):'<b>ครบทั้ง 3 ด้าน</b> — ทุก อปท. ในขอบเขตนี้มีทรัพยากรทุกด้าน')+'</div>'
+    +'<div class="pbtn noprint"><button type="button" class="reset" id="prof-print">🖨 พิมพ์ / บันทึกเป็น PDF</button><button type="button" class="reset" id="prof-xl">⬇ ดาวน์โหลด Excel</button></div></div><div class="card mapcard" id="map-prof"></div></div>'
+    +'<div class="kpis">'+kpi(COL.vol,'อปพร. (มีชีวิต)',fmt(tot.vol),single?'คน':'คน · มีใน '+fmt(has.vol)+'/'+fmt(n)+' อปท.')+kpi(COL.dev,'เครื่องมือ (พร้อมปฏิบัติงาน)',fmt(tot.dev),single?'รายการ':'รายการ · มีใน '+fmt(has.dev)+'/'+fmt(n)+' อปท.')+kpi(COL.veh,'เครื่องจักรกล (พร้อมปฏิบัติงาน)',fmt(tot.veh),single?'คัน/ลำ/เครื่อง':'คัน/ลำ/เครื่อง · มีใน '+fmt(has.veh)+'/'+fmt(n)+' อปท.')+'</div>'
+    +'<div class="grid">'+vsec+sec('veh')+sec('dev')
+    +(single?'':'<div class="card c12 psec"><h2>พื้นที่ย่อย · จำแนกตาม'+U.k+'</h2><p class="hint">คลิกชื่อเพื่อเจาะลึกลงไป</p><div class="tw" id="prof-unit"></div></div>')
+    +(CT?'<div class="card c12 psec noprint"><h2>ผู้ประสานงาน</h2><div class="mcont" style="border:0;margin:0;padding:0">'+profContacts()+'</div></div>':'')+'</div>';
+  drawMap('prof',provTotals(i=>cnt.vol[i]+cnt.dev[i]+cnt.veh[i]),'all','ตำแหน่งในประเทศไทย (รวมทุกทรัพยากร)');
+  const spItems=Object.entries(sp).filter(([k])=>k!=='ไม่ระบุ').map(([l,v])=>({l,v})).sort((a,b)=>b.v-a.v);
+  bars($('prof-spec'),spItems,{color:COL.vol});
+  if(!single){
+    const m=new Map();for(const e of es){const key=U.f(e);let r=m.get(key);if(!r){r={n:U.l(e),k:key,opt:0,vol:0,dev:0,veh:0};m.set(key,r)}r.opt++;r.vol+=cnt.vol[e.i];r.dev+=cnt.dev[e.i];r.veh+=cnt.veh[e.i]}
+    table($('prof-unit'),[{k:'n',h:U.k},{k:'opt',h:'อปท.'},{k:'vol',h:'อปพร.'},{k:'dev',h:'เครื่องมือ'},{k:'veh',h:'เครื่องจักรกล'}],[...m.values()].sort((a,b)=>th(a.n,b.n)));
+    $('prof-unit').onclick=ev=>{const tr=ev.target.closest('tr[data-k]');if(tr)drill(U.lv,tr.dataset.k)};
+  }
+  $('prof-root').onclick=ev=>{const r=ev.target.closest('.ms.hl');if(r)openDetail(+r.dataset.i)};
+  $('prof-print').onclick=()=>window.print();$('prof-xl').onclick=exportAll;
+}
+
+/* ---------- shell ---------- */
+let page='sum',fk='veh';
+function renderPage(){
+  if(page==='find'){document.querySelectorAll('.fsub').forEach(x=>x.classList.toggle('on',x.id==='f-'+fk));
+    $('find-seg').querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',b.dataset.k===fk));
+    ({vol:renderVol,dev:()=>renderAsset('dev'),veh:()=>renderAsset('veh')})[fk]();return}
+  ({sum:renderSum,prof:renderProf})[page]();
+}
+$('find-seg').onclick=ev=>{const b=ev.target.closest('button');if(b){fk=b.dataset.k;renderPage()}};
+window.addEventListener('beforeprint',()=>document.querySelectorAll('#prof-root details').forEach(d=>d.open=true));
 function scopeText(){
   const L_=[['','ทั้งประเทศ']];
   if(S.g)L_.push(['g',S.g]);if(S.p)L_.push(['p','จ.'+S.p]);if(S.a)L_.push(['a','อ.'+S.a.split('|')[1]]);if(S.o!=='')L_.push(['o',E[+S.o].n]);
@@ -673,7 +796,7 @@ $('note').innerHTML=`<b>หมายเหตุการจัดทำข้�
 </ul>`;
 if(CT)$('asof').textContent+=' · ฉบับมีข้อมูลติดต่อ — ใช้ภายในองค์กรเท่านั้น ห้ามเผยแพร่';
 const h=location.hash.slice(1);
-update();if(['vol','dev','veh'].includes(h))setPage(h);
+update();if(['vol','dev','veh'].includes(h)){fk=h;setPage('find')}else if(['find','prof'].includes(h))setPage(h);
 </script>
 </body>
 </html>
