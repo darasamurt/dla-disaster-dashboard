@@ -30,6 +30,9 @@ select{width:100%;font:inherit;padding:7px 8px;border:1px solid #c9d2de;border-r
 select:focus-visible,button:focus-visible{outline:2px solid #4c8dff;outline-offset:1px}
 .reset{font:inherit;border:1px solid #c9d2de;background:#fff;border-radius:8px;padding:7px 14px;min-height:38px;cursor:pointer;color:var(--ink)}
 .reset:hover{background:#eef2f7}
+.fbtns{display:flex;gap:8px}
+.reset.dl{background:var(--accent);color:#fff;border-color:var(--accent);white-space:nowrap}
+.reset.dl:hover{background:#274b7a}
 main{max-width:1280px;margin:0 auto;padding:16px}
 .scope{font-size:13px;color:var(--muted);margin:0 0 12px}
 .scope b{color:var(--ink)}
@@ -112,12 +115,12 @@ td.zero{color:#b45309;background:#fff7ed}
   .mcols{grid-template-columns:1fr}
   .r2{grid-row:auto}
   .filters .wrap{grid-template-columns:1fr 1fr}
-  .reset{grid-column:span 2}
+  .fbtns{grid-column:span 2}
   .c4,.c5,.c6,.c7,.c8{grid-column:span 12}
   .br{grid-template-columns:minmax(80px,40%) 1fr 56px}
 }
 @media (max-width:520px){
-  .filters .wrap{grid-template-columns:1fr}.reset{grid-column:auto}
+  .filters .wrap{grid-template-columns:1fr}.fbtns{grid-column:auto}
   h1{font-size:17px}.kpi .v{font-size:24px}
 }
 </style>
@@ -139,7 +142,7 @@ td.zero{color:#b45309;background:#fff7ed}
   <div class="f"><label for="fp">จังหวัด</label><select id="fp"></select></div>
   <div class="f"><label for="fa">อำเภอ</label><select id="fa"></select></div>
   <div class="f"><label for="fo">อปท.</label><select id="fo"></select></div>
-  <button class="reset" id="reset" type="button">ล้างตัวกรอง</button>
+  <div class="fbtns"><button class="reset" id="reset" type="button">ล้างตัวกรอง</button><button class="reset dl" id="dl-all" type="button" title="ดาวน์โหลดข้อมูลตามตัวกรองที่เลือกเป็นไฟล์ Excel">⬇ ดาวน์โหลด Excel</button></div>
 </div></div>
 
 <main>
@@ -153,7 +156,7 @@ td.zero{color:#b45309;background:#fff7ed}
       <div class="card c7"><h2>ความครอบคลุมของ อปท.</h2><p class="hint">สัดส่วน อปท. ในขอบเขตที่เลือก ที่มีทรัพยากรพร้อมใช้อย่างน้อย 1 รายการ</p><div class="cov" id="sum-cov"></div></div>
       <div class="card c12"><h2>รายชื่อ อปท. — มีอะไรบ้าง</h2><p class="hint" id="sum-list-h"></p>
         <div class="listbar"><input type="search" class="searchbox" id="sum-search" placeholder="ค้นหาชื่อ อปท. / อำเภอ / จังหวัด">
-          <span class="seg" id="sum-flt"><button type="button" data-f="">ทั้งหมด</button><button type="button" data-f="vol">ไม่มี อปพร.</button><button type="button" data-f="dev">ไม่มีเครื่องมือ</button><button type="button" data-f="veh">ไม่มีเครื่องจักรกล</button></span><button type="button" class="reset" id="sum-csv">ดาวน์โหลด CSV</button></div>
+          <span class="seg" id="sum-flt"><button type="button" data-f="">ทั้งหมด</button><button type="button" data-f="vol">ไม่มี อปพร.</button><button type="button" data-f="dev">ไม่มีเครื่องมือ</button><button type="button" data-f="veh">ไม่มีเครื่องจักรกล</button></span><button type="button" class="reset" id="sum-csv">ดาวน์โหลด Excel</button></div>
         <div class="tw tall" id="sum-top"></div></div>
       <div class="card c12"><h2>จำแนกตามประเภท อปท.</h2><p class="hint">จำนวน อปท. และทรัพยากรที่พร้อมใช้</p><div id="sum-type"></div></div>
     </div>
@@ -289,14 +292,108 @@ function drawMap(page,tot,key,label,extra,detail){
   el.querySelectorAll('.seg button').forEach(b=>b.onclick=()=>{MET[page]=b.dataset.m;renderPage()});
 }
 
-/* ---------- CSV (เปิดใน Excel ได้ ภาษาไทยไม่เพี้ยน) ---------- */
+/* ---------- Excel (.xlsx) — สร้างไฟล์ในเบราว์เซอร์เอง ไม่ต้องใช้อินเทอร์เน็ต ---------- */
 function scopeName(){return S.o!==''?E[+S.o].n:S.a?S.a.split('|')[1]:(S.p||S.g||'ทั้งประเทศ')}
-function csv(name,head,rows){
-  const q=v=>'"'+String(v).replace(/"/g,'""')+'"';
-  const s='\ufeff'+[head].concat(rows).map(r=>r.map(q).join(',')).join('\r\n');
-  const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([s],{type:'text/csv;charset=utf-8'}));a.download=name+'.csv';
-  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+const CRC=(()=>{const t=new Uint32Array(256);for(let n=0;n<256;n++){let c=n;for(let k=0;k<8;k++)c=c&1?0xEDB88320^(c>>>1):c>>>1;t[n]=c>>>0}return t})();
+const crc32=u=>{let c=0xFFFFFFFF;for(let i=0;i<u.length;i++)c=CRC[(c^u[i])&255]^(c>>>8);return(c^0xFFFFFFFF)>>>0};
+const xcol=n=>{let s='';n++;while(n>0){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26)}return s};
+function zipStore(files){
+  const enc=new TextEncoder(),parts=[],cen=[];let off=0;
+  for(const f of files){
+    const nm=enc.encode(f.name),d=typeof f.data==='string'?enc.encode(f.data):f.data,crc=crc32(d);
+    const lh=new DataView(new ArrayBuffer(30));
+    lh.setUint32(0,0x04034b50,true);lh.setUint16(4,20,true);lh.setUint16(6,0x0800,true);lh.setUint16(8,0,true);lh.setUint16(10,0,true);lh.setUint16(12,33,true);
+    lh.setUint32(14,crc,true);lh.setUint32(18,d.length,true);lh.setUint32(22,d.length,true);lh.setUint16(26,nm.length,true);lh.setUint16(28,0,true);
+    parts.push(new Uint8Array(lh.buffer),nm,d);
+    const ch=new DataView(new ArrayBuffer(46));
+    ch.setUint32(0,0x02014b50,true);ch.setUint16(4,20,true);ch.setUint16(6,20,true);ch.setUint16(8,0x0800,true);ch.setUint16(10,0,true);ch.setUint16(12,0,true);ch.setUint16(14,33,true);
+    ch.setUint32(16,crc,true);ch.setUint32(20,d.length,true);ch.setUint32(24,d.length,true);ch.setUint16(28,nm.length,true);ch.setUint32(42,off,true);
+    cen.push(new Uint8Array(ch.buffer),nm);
+    off+=30+nm.length+d.length;
+  }
+  const cs=cen.reduce((s,x)=>s+x.length,0),end=new DataView(new ArrayBuffer(22));
+  end.setUint32(0,0x06054b50,true);end.setUint16(8,files.length,true);end.setUint16(10,files.length,true);end.setUint32(12,cs,true);end.setUint32(16,off,true);
+  return new Blob(parts.concat(cen,[new Uint8Array(end.buffer)]),{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
 }
+function xlsxBlob(sheets){
+  const X=s=>String(s).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g,'').replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+  const colL=n=>{let s='';n++;while(n>0){const m=(n-1)%26;s=String.fromCharCode(65+m)+s;n=Math.floor((n-1)/26)}return s};
+  const names=sheets.map((s,i)=>X(String(s.name).replace(/[\[\]:*?\/\\]/g,' ').slice(0,31)||'Sheet'+(i+1)));
+  const sheetXml=sh=>{
+    const bold=new Set(sh.bold||[0]),nc=Math.max(1,...sh.rows.map(r=>r.length));
+    const w=[];for(let c=0;c<nc;c++){let m=6;for(let r=0;r<Math.min(sh.rows.length,300);r++){const v=sh.rows[r][c];if(v!=null&&(r>=3||sh.rows.length<=3))m=Math.max(m,String(v).length)}w.push(Math.min(60,Math.round(m*1.15)+2))}
+    let x='<?xml version="1.0" encoding="UTF-8" standalone="yes"?><worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0">'+(sh.freeze?'<pane ySplit="'+sh.freeze+'" topLeftCell="A'+(sh.freeze+1)+'" activePane="bottomLeft" state="frozen"/>':'')+'</sheetView></sheetViews><sheetFormatPr defaultRowHeight="15"/><cols>'+w.map((v,i)=>'<col min="'+(i+1)+'" max="'+(i+1)+'" width="'+v+'" customWidth="1"/>').join('')+'</cols><sheetData>';
+    sh.rows.forEach((r,ri)=>{x+='<row r="'+(ri+1)+'">';r.forEach((v,ci)=>{if(v==null||v==='')return;const ref=colL(ci)+(ri+1),s=bold.has(ri)?' s="1"':'';
+      x+=typeof v==='number'&&isFinite(v)?'<c r="'+ref+'"'+s+'><v>'+v+'</v></c>':'<c r="'+ref+'"'+s+' t="inlineStr"><is><t xml:space="preserve">'+X(v)+'</t></is></c>'});x+='</row>'});
+    x+='</sheetData>'+(sh.filter&&sh.rows.length>1?'<autoFilter ref="A1:'+colL(nc-1)+sh.rows.length+'"/>':'')+(sh.merges&&sh.merges.length?'<mergeCells count="'+sh.merges.length+'">'+sh.merges.map(m=>'<mergeCell ref="'+m+'"/>').join('')+'</mergeCells>':'')+'</worksheet>';return x;
+  };
+  const H='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>';
+  const files=[
+    {name:'[Content_Types].xml',data:H+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>'+sheets.map((s,i)=>'<Override PartName="/xl/worksheets/sheet'+(i+1)+'.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>').join('')+'</Types>'},
+    {name:'_rels/.rels',data:H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'},
+    {name:'xl/workbook.xml',data:H+'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships"><sheets>'+names.map((n,i)=>'<sheet name="'+n+'" sheetId="'+(i+1)+'" r:id="rId'+(i+1)+'"/>').join('')+'</sheets></workbook>'},
+    {name:'xl/_rels/workbook.xml.rels',data:H+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">'+sheets.map((s,i)=>'<Relationship Id="rId'+(i+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet'+(i+1)+'.xml"/>').join('')+'<Relationship Id="rId'+(sheets.length+1)+'" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'},
+    {name:'xl/styles.xml',data:H+'<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Tahoma"/></font><font><b/><sz val="11"/><name val="Tahoma"/></font></fonts><fills count="3"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill><fill><patternFill patternType="solid"><fgColor rgb="FFD9E2F3"/></patternFill></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="2" borderId="0" xfId="0" applyFont="1" applyFill="1"/></cellXfs></styleSheet>'}
+  ].concat(sheets.map((s,i)=>({name:'xl/worksheets/sheet'+(i+1)+'.xml',data:sheetXml(s)})));
+  return zipStore(files);
+}
+function xlsxDownload(name,sheets){
+  const a=document.createElement('a');a.href=URL.createObjectURL(xlsxBlob(sheets));a.download=name.replace(/[\\\/:*?"<>|]/g,'_')+'.xlsx';
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
+/* ตารางรายชื่อในแต่ละหน้า → Excel 1 แผ่น */
+function csv(name,head,rows){xlsxDownload(name,[{name:'ข้อมูล',rows:[head].concat(rows),freeze:1,filter:1}])}
+
+/* ปุ่ม "ดาวน์โหลด Excel" ที่แถบตัวกรอง → ไฟล์หลายแผ่นตามขอบเขต (กลุ่มจังหวัด/จังหวัด/อำเภอ/อปท.) ที่เลือก */
+function scopePlain(){const p=[];if(S.g)p.push('กลุ่มจังหวัด'+S.g);if(S.p)p.push('จังหวัด'+S.p);if(S.a)p.push('อำเภอ'+S.a.split('|')[1]);if(S.o!=='')p.push(E[+S.o].n);return p.length?p.join(' › '):'ทั้งประเทศ'}
+function exportAll(){
+  const es=okEnts(),rank=new Int32Array(N);
+  [...E].sort((x,y)=>th(x.p,y.p)||th(x.a,y.a)||th(x.n,y.n)).forEach((e,i)=>rank[e.i]=i);
+  const byRank=(x,y)=>rank[x[0]]-rank[y[0]];
+  let tv=0,td=0,tc=0,hv=0,hd=0,hc=0;
+  for(const e of es){tv+=cnt.vol[e.i];td+=cnt.dev[e.i];tc+=cnt.veh[e.i];if(cnt.vol[e.i])hv++;if(cnt.dev[e.i])hd++;if(cnt.veh[e.i])hc++}
+  // แผ่น 1: สรุป
+  const U=unitInfo(),um=new Map();
+  for(const e of es){const k=U.f(e);let r=um.get(k);if(!r){r={n:U.l(e),opt:0,v:0,d:0,c:0};um.set(k,r)}r.opt++;r.v+=cnt.vol[e.i];r.d+=cnt.dev[e.i];r.c+=cnt.veh[e.i]}
+  const sum=[['ทรัพยากรด้านการป้องกันและบรรเทาสาธารณภัย ขององค์กรปกครองส่วนท้องถิ่น'],['ข้อมูล ณ วันที่ '+D.asof+' · นับเฉพาะ อปพร. สถานะ "มีชีวิต" และเครื่องมือ/เครื่องจักรกลสถานะ "พร้อมปฏิบัติงาน"'],['ขอบเขตข้อมูล: '+scopePlain()+' · '+es.length+' อปท.'],[],
+    ['รายการ','จำนวนรวม','อปท. ที่มี','จาก อปท. ทั้งหมด'],['อปพร. (คน)',tv,hv,es.length],['เครื่องมือ (รายการ)',td,hd,es.length],['เครื่องจักรกล (รายการ)',tc,hc,es.length],[],
+    [U.k,'อปท.','อปพร. (คน)','เครื่องมือ','เครื่องจักรกล']].concat([...um.values()].sort((x,y)=>th(x.n,y.n)).map(r=>[r.n,r.opt,r.v,r.d,r.c]));
+  // แผ่น 2: รายชื่อ อปท.
+  const lao=[['จังหวัด','กลุ่มจังหวัด','อำเภอ','อปท.','ประเภท อปท.','อปพร. (คน)','เครื่องมือ','เครื่องจักรกล']].concat(es.map(e=>[e.i,e.p,e.g,e.a,e.n,e.t,cnt.vol[e.i],cnt.dev[e.i],cnt.veh[e.i]]).sort(byRank).map(r=>r.slice(1)));
+  // แผ่น 3: อปพร.
+  const vol=[['จังหวัด','อำเภอ','อปท.','เพศ','ความรู้เฉพาะทาง','จำนวน (คน)']].concat(D.vol.filter(r=>ok[r[0]]).map(r=>[r[0],E[r[0]].p,E[r[0]].a,E[r[0]].n,D.sex[r[1]],D.spec[r[2]],r[3]]).sort(byRank).map(r=>r.slice(1)));
+  // แผ่นรายประเภท — รูปแบบเดียวกับไฟล์ตัวอย่าง จ.สตูล/ภูเก็ต: รถ_<ประเภท>, อป_<ประเภท> แถวละ 1 รายการ
+  const prov=S.p?'จ.'+S.p:scopePlain();
+  const note='ข้อมูลอุปกรณ์/รถ: ระบบ DIS ณ วันที่ '+D.asof+' (เฉพาะสถานะพร้อมปฏิบัติงาน)'+(CT?' | ข้อมูลผู้ประสาน: รายชื่อผู้ปฏิบัติงานด้านสาธารณภัยของ อปท.':'');
+  const roles=['นายก อปท.','ปลัด อปท.','ผู้อำนวยการกอง/สำนักที่รับผิดชอบ','เจ้าหน้าที่ผู้รับผิดชอบ'];
+  const used=new Set(['สรุป','รายชื่อ อปท.','อปพร.']);
+  const uniq=nm=>{let n=nm.slice(0,31),i=2;while(used.has(n))n=nm.slice(0,28)+'_'+i++;used.add(n);return n};
+  const itemSheets=k=>{
+    const d=CFG[k].d,by=new Map(),isV=k==='veh',pre=isV?'รถ_':'อป_';
+    for(const r of d.rows){if(!ok[r[0]])continue;const g=d.g[r[1]];let a=by.get(g);if(!a){a=[];by.set(g,a)}for(let n=0;n<r[5];n++)a.push([r[0],d.s[r[2]]])}
+    return[...by].sort((x,y)=>y[1].length-x[1].length).map(([g,items])=>{
+      const gn=g.replace(/^กลุ่ม/,'').trim(),base=['ลำดับ','จังหวัด','อำเภอ','อปท.',isV?'ประเภทรถ':'ประเภทอุปกรณ์','ประเภทย่อย'],nc=base.length+(CT?12:0);
+      const pad=a=>a.concat(Array(Math.max(0,nc-a.length)).fill(''));
+      const rows=[pad(['รายการ'+(isV?'รถ':'อุปกรณ์')+' '+gn+' '+prov+' พร้อมรายชื่อผู้ประสานงานด้านการป้องกันและบรรเทาสาธารณภัย']),pad([note]),pad([])],merges=[],bold=[0,3];
+      if(CT){
+        rows.push(pad(base.concat(...roles.map(r=>[r,'','']))));rows.push(pad(['','','','','',''].concat(...roles.map(()=>['ชื่อ-สกุล','ตำแหน่ง','เบอร์โทร']))));bold.push(4);
+        for(let c=0;c<6;c++)merges.push(xcol(c)+'4:'+xcol(c)+'5');
+        roles.forEach((_,i)=>merges.push(xcol(6+3*i)+'4:'+xcol(8+3*i)+'4'));
+      }else rows.push(base);
+      items.sort((x,y)=>rank[x[0]]-rank[y[0]]||th(x[1],y[1])).forEach((it,i)=>{
+        const e=E[it[0]],row=[i+1,e.p,e.a,e.n,g,it[1]],c=CT&&CT.laos[it[0]];
+        if(CT)for(let q=0;q<4;q++){const p=c?c[q]:null;row.push(p?p.n:'',p?p.t:'',p?p.tel:'')}
+        rows.push(row);
+      });
+      return{name:uniq(pre+(isV?gn.replace(/^รถ/,''):gn)),rows,bold,merges,freeze:CT?5:4};
+    });
+  };
+  xlsxDownload('dashboard_ทรัพยากรสาธารณภัย_'+scopeName(),[
+    {name:'สรุป',rows:sum,bold:[0,4,9]},
+    {name:'รายชื่อ อปท.',rows:lao,freeze:1,filter:1},
+    {name:'อปพร.',rows:vol,freeze:1,filter:1}].concat(itemSheets('veh'),itemSheets('dev')));
+}
+$('dl-all').onclick=exportAll;
 
 /* ---------- รายชื่อ อปท. ที่มีเครื่องมือ/เครื่องจักรกล พร้อมประเภทย่อย ---------- */
 const AL={dev:{rows:[],k:null,d:1},veh:{rows:[],k:null,d:1}};
@@ -455,7 +552,7 @@ const CFG={
     <div class="card c7"><h2 id="${k}-sub-t"></h2><p class="hint">คลิกแท่งเพื่อกรองเฉพาะ${CFG[k].sub}นี้</p><div class="bars" id="${k}-sub"></div></div>
     <div class="card c5"><h2>ประเภทภัยที่รองรับ</h2><p class="hint">1 รายการรองรับได้หลายภัย จึงนับซ้ำได้</p><div class="bars" id="${k}-haz"></div></div>
     <div class="card c12"><h2>รายชื่อ อปท. ที่มี${CFG[k].what} — มีอะไรบ้าง</h2><p class="hint" id="${k}-list-h"></p>
-      <div class="listbar"><input type="search" class="searchbox" id="${k}-search" placeholder="ค้นหาชื่อ อปท. / อำเภอ / จังหวัด / ประเภทย่อย"><button type="button" class="reset" id="${k}-csv">ดาวน์โหลด CSV</button></div>
+      <div class="listbar"><input type="search" class="searchbox" id="${k}-search" placeholder="ค้นหาชื่อ อปท. / อำเภอ / จังหวัด / ประเภทย่อย"><button type="button" class="reset" id="${k}-csv">ดาวน์โหลด Excel</button></div>
       <div class="tw tall" id="${k}-top"></div></div>
     <div class="card c12"><h2 id="${k}-unit-t"></h2><div class="bars" id="${k}-unit"></div></div>
   </div>`});
